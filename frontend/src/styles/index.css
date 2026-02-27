@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: 139 92 246; /* violet-500 */
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Focus ring for keyboard nav */
+  :focus-visible {
+    outline: 2px solid rgb(139 92 246);
+    outline-offset: 2px;
+  }
+
+  /* Skip to content link */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-violet-700 focus:px-4 focus:py-2 focus:text-white;
+  }
+}
