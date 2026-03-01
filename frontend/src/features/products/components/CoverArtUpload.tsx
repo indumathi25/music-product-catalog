@@ -1,4 +1,5 @@
 import { useRef, useCallback, memo } from 'react';
+import { ACCEPTED_IMAGE_TYPES_STRING } from '@/constants';
 
 interface CoverArtUploadProps {
     preview: string | null;
@@ -30,9 +31,9 @@ export const CoverArtUpload = memo(function CoverArtUpload({
 
     return (
         <div className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">
+            <label htmlFor="cover-art" className="text-sm font-medium text-gray-700">
                 Cover Art <span aria-hidden="true" className="text-red-500">*</span>
-            </span>
+            </label>
             <div
                 role="button"
                 tabIndex={0}
@@ -81,12 +82,11 @@ export const CoverArtUpload = memo(function CoverArtUpload({
                 )}
             </div>
             <input
+                id="cover-art"
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={ACCEPTED_IMAGE_TYPES_STRING}
                 className="sr-only"
-                aria-hidden="true"
-                tabIndex={-1}
                 onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) onFileSelect(file);
