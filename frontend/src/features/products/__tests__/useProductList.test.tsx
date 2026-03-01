@@ -10,10 +10,10 @@ vi.mock('../hooks/useProducts', () => ({
     PRODUCTS_QUERY_KEY: ['products'],
 }));
 
-vi.mock('@/store/hooks', () => ({
-    useAppSelector: vi.fn(),
+vi.mock('react-redux', () => ({
+    useSelector: vi.fn(),
 }));
-import { useAppSelector } from '@/store/hooks';
+import { useSelector } from 'react-redux';
 
 const queryClient = new QueryClient();
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -23,7 +23,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('useProductList', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(useAppSelector).mockReturnValue('');
+        vi.mocked(useSelector).mockReturnValue('');
 
         vi.mocked(useProductsMock.useProducts).mockReturnValue({
             data: { pages: [{ data: [], total: 0, page: 1, limit: 12 }], pageParams: [1] },

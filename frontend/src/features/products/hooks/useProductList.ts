@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useProducts, PRODUCTS_QUERY_KEY } from './useProducts';
 import { productsApi } from '../api';
-import { useAppSelector } from '@/store/hooks';
 import { ProductFilterParams, Product } from '../types';
 
 export function useProductList() {
-    const searchQuery = useAppSelector((state) => state.products.searchQuery);
+    const searchQuery = useSelector((state: RootState) => state.products.searchQuery);
     const [filters, setFilters] = useState<Omit<ProductFilterParams, 'search' | 'page'>>({
         artistName: '',
         limit: 12,

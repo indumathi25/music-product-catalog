@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
 import { setSearchQuery } from '../store/slices/productSlice';
 
 export function Navbar() {
     const location = useLocation();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const searchQuery = useAppSelector((state) => state.products.searchQuery);
+    const dispatch = useDispatch<AppDispatch>();
+    const searchQuery = useSelector((state: RootState) => state.products.searchQuery);
 
     const showSearch = location.pathname === '/';
 

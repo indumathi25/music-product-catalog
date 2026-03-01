@@ -7,8 +7,8 @@ import * as useProductDeletionMock from '../hooks/useProductDeletion';
 
 // Need to mock dispatch since EmptyState fires it for "Clear filters"
 const mockDispatch = vi.fn();
-vi.mock('@/store/hooks', () => ({
-    useAppDispatch: () => mockDispatch,
+vi.mock('react-redux', () => ({
+    useDispatch: () => mockDispatch,
 }));
 
 vi.mock('../hooks/useProductList', () => ({

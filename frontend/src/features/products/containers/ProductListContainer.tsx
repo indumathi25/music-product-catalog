@@ -6,11 +6,12 @@ import { ProductGridSkeleton } from '../components/ProductGridSkeleton';
 import { DeleteModal } from '../components/DeleteModal';
 import { ProductFilters } from '../components/ProductFilters';
 import { EmptyState } from '@/components/EmptyState';
-import { useAppDispatch } from '@/store/hooks';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store';
 import { clearSearchQuery } from '@/store/slices/productSlice';
 
 export function ProductListContainer() {
-    const dispatch = useAppDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
     const {
