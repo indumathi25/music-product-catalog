@@ -6,6 +6,8 @@ jest.mock('../service');
 
 const mockService = productService as jest.Mocked<typeof productService>;
 
+const AUTH_HEADER = { 'x-api-key': process.env.API_KEY ?? 'fuga_secret_key_2026' };
+
 const sampleProduct = {
     id: 1,
     name: 'Abbey Road',
@@ -46,8 +48,16 @@ describe('Product Routes', () => {
     describe('DELETE /api/products/:id', () => {
         it('returns 204 on successful delete', async () => {
             mockService.delete.mockResolvedValue(undefined);
-            const res = await request(app).delete(`/api/products/${sampleProduct.id}`);
+            const res = await request(app)
+                .delete(`/api/products/${sampleProduct.id}`)
+                .set(AUTH_HEADER);
             expect(res.status).toBe(204);
+        });
+
+        it('returns 401 without auth header', async () => {
+            const res = await request(app).delete(`/api/products/${sampleProduct.id}`);
+            expect(res.status).toBe(401);
+            expect(res.body.error.code).toBe('UNAUTHORIZED');
         });
     });
 });
