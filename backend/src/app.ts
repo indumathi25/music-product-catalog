@@ -10,19 +10,47 @@ import { registerRoutes } from './routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { env } from './config/env';
 import { logger } from './lib/logger';
+import { globalLimiter } from './middlewares/rateLimiter';
 
 const app = express();
 
+// Security Headers
 app.use(
     helmet({
         crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow image serving
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'", "data:", "blob:", "*.amazonaws.com", "loremflickr.com"],
+                connectSrc: ["'self'", "*.amazonaws.com"],
+                frameAncestors: ["'none'"], // Protect against Iframes (Clickjacking)
+            },
+        },
+        hsts: {
+            maxAge: 31536000,
+            includeSubDomains: true,
+            preload: true,
+        },
     }),
 );
+
+// Frame Protection & Sniffing Protection (Explicit)
+app.use((_req, res, next) => {
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    next();
+});
+
+// Rate Limiting
+app.use('/api/', globalLimiter);
+
 app.use(
     cors({
         origin: env.CORS_ORIGIN,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY'],
         credentials: true,
     }),
 );
@@ -39,7 +67,7 @@ try {
     const yamlPath = path.resolve(__dirname, 'docs/openapi.yaml');
     const fileContent = fs.readFileSync(yamlPath, 'utf8');
     swaggerSpec = yaml.load(fileContent);
-    // Dynamically update server URL based on env
+
     if (swaggerSpec && swaggerSpec.servers) {
         swaggerSpec.servers = [{ url: `http://localhost:${env.PORT}` }];
     }
