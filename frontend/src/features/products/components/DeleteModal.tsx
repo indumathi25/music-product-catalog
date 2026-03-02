@@ -35,10 +35,8 @@ export function DeleteModal({ product, isDeleting, onConfirm, onCancel }: Delete
             className="fixed inset-0 z-50 flex items-center justify-center"
             onClick={onCancel}
         >
-            {/* Backdrop */}
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" />
 
-            {/* Dialog */}
             <div
                 role="dialog"
                 aria-modal="true"
@@ -60,7 +58,7 @@ export function DeleteModal({ product, isDeleting, onConfirm, onCancel }: Delete
 
                 <p id="delete-dialog-description" className="mb-6 text-sm text-gray-600">
                     Are you sure you want to delete{' '}
-                    <strong className="font-semibold text-gray-900">"{product.name}"</strong> by{' '}
+                    <strong className="font-semibold text-gray-900">"{product.title}"</strong> by{' '}
                     <strong className="font-semibold text-gray-900">{product.artistName}</strong>? This
                     action cannot be undone.
                 </p>

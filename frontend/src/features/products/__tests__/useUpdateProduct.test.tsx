@@ -27,6 +27,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('useUpdateProduct', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -36,19 +38,19 @@ describe('useUpdateProduct', () => {
     });
 
     it('updates a product and invalidates cache', async () => {
-        const mockProduct = { id: 1, name: 'Updated Product' };
+        const mockProduct = { id: VALID_UUID, title: 'Updated Product' };
         vi.mocked(productsApi.update).mockResolvedValue(mockProduct as any);
 
         const { result } = renderHook(() => useUpdateProduct(), { wrapper });
 
-        const dto = { name: 'Updated Product' };
+        const dto = { title: 'Updated Product' };
 
-        result.current.mutate({ id: 1, dto });
+        result.current.mutate({ id: VALID_UUID, dto });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(productsApi.update).toHaveBeenCalledWith(1, dto);
-        expect(queryClient.setQueryData).toHaveBeenCalledWith([...PRODUCT_QUERY_KEY, 1], mockProduct);
+        expect(productsApi.update).toHaveBeenCalledWith(VALID_UUID, dto);
+        expect(queryClient.setQueryData).toHaveBeenCalledWith([...PRODUCT_QUERY_KEY, VALID_UUID], mockProduct);
         expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: PRODUCTS_QUERY_KEY });
         expect(mockDispatch).toHaveBeenCalledWith(
             expect.objectContaining({

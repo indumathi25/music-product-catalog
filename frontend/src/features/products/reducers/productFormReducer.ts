@@ -1,16 +1,16 @@
 import { Product } from '../types';
 
 export interface ProductFormState {
-    name: string;
+    title: string;
     artistName: string;
     file: File | null;
     preview: string | null;
-    errors: Partial<Record<'name' | 'artistName' | 'file', string>>;
+    errors: Partial<Record<'title' | 'artistName' | 'file', string>>;
     isSubmitting: boolean;
 }
 
 export const initialFormState: ProductFormState = {
-    name: '',
+    title: '',
     artistName: '',
     file: null,
     preview: null,
@@ -19,7 +19,7 @@ export const initialFormState: ProductFormState = {
 };
 
 export type ProductFormAction =
-    | { type: 'SET_FIELD'; field: 'name' | 'artistName'; value: string }
+    | { type: 'SET_FIELD'; field: 'title' | 'artistName'; value: string }
     | { type: 'SET_FILE'; file: File; preview: string }
     | { type: 'CLEAR_FILE' }
     | { type: 'SET_ERRORS'; errors: ProductFormState['errors'] }
@@ -49,9 +49,9 @@ export function productFormReducer(
         case 'POPULATE':
             return {
                 ...state,
-                name: action.product.name,
+                title: action.product.title,
                 artistName: action.product.artistName,
-                preview: action.product.coverUrl,
+                preview: action.product.coverArtUrl,
             };
         case 'RESET':
             return initialFormState;
@@ -59,4 +59,3 @@ export function productFormReducer(
             return state;
     }
 }
-

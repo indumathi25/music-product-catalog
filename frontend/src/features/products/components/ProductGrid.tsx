@@ -13,9 +13,13 @@ export function ProductGrid({ products, onDelete }: ProductGridProps) {
             aria-label="Products"
             className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4"
         >
-            {products.map((product) => (
+            {products.map((product, index) => (
                 <li key={product.id} role="listitem">
-                    <ProductCard product={product} onDelete={onDelete} />
+                    <ProductCard
+                        product={product}
+                        onDelete={onDelete}
+                        priority={index < 4}
+                    />
                 </li>
             ))}
         </ul>

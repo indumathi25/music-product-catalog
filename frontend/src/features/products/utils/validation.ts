@@ -20,7 +20,7 @@ export function validateForm(
         }
     };
 
-    validateText(state.name, 'name', 'Name');
+    validateText(state.title, 'title', 'Title');
     validateText(state.artistName, 'artistName', 'Artist name');
 
     if (requireFile && !state.file) {

@@ -39,11 +39,10 @@ describe('CreateProductContainer', () => {
         );
 
         // Fill out required fields
-        fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'New Song' } });
+        fireEvent.change(screen.getByLabelText(/Product Title/i), { target: { value: 'New Song' } });
         fireEvent.change(screen.getByLabelText(/Artist Name/i), { target: { value: 'New Artist' } });
 
-        // Mocking file upload is tricky, we can simulate dispatching state or testing validation separately
-        // Here we just want to test container logic. Since validation needs a file, let's inject a mock file.
+        // Mocking file upload
         const fileInput = screen.getByLabelText(/Cover Art/i, { selector: 'input[type="file"]' });
         const file = new File(['dummy content'], 'cover.png', { type: 'image/png' });
         fireEvent.change(fileInput, { target: { files: [file] } });
@@ -58,7 +57,7 @@ describe('CreateProductContainer', () => {
 
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith(expect.objectContaining({
-                name: 'New Song',
+                title: 'New Song',
                 artistName: 'New Artist',
                 coverArt: file
             }));

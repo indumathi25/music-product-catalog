@@ -10,7 +10,7 @@ export function useDeleteProduct() {
     const dispatch = useDispatch();
 
     return useMutation({
-        mutationFn: (id: number) => productsApi.delete(id),
+        mutationFn: (id: string) => productsApi.delete(id),
         onSuccess: (_, id) => {
             queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
             queryClient.invalidateQueries({ queryKey: [...PRODUCT_QUERY_KEY, id] });

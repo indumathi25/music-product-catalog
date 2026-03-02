@@ -19,6 +19,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('useProduct', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -26,14 +28,14 @@ describe('useProduct', () => {
     });
 
     it('fetches a single product when id is provided', async () => {
-        const mockProduct = { id: 1, name: 'Test Product' };
+        const mockProduct = { id: VALID_UUID, title: 'Test Product' };
         vi.mocked(productsApi.getById).mockResolvedValue(mockProduct as any);
 
-        const { result } = renderHook(() => useProduct(1), { wrapper });
+        const { result } = renderHook(() => useProduct(VALID_UUID), { wrapper });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(productsApi.getById).toHaveBeenCalledWith(1);
+        expect(productsApi.getById).toHaveBeenCalledWith(VALID_UUID);
         expect(result.current.data).toEqual(mockProduct);
     });
 

@@ -27,6 +27,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('useDeleteProduct', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -39,13 +41,13 @@ describe('useDeleteProduct', () => {
 
         const { result } = renderHook(() => useDeleteProduct(), { wrapper });
 
-        result.current.mutate(1);
+        result.current.mutate(VALID_UUID);
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(productsApi.delete).toHaveBeenCalledWith(1);
+        expect(productsApi.delete).toHaveBeenCalledWith(VALID_UUID);
         expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: PRODUCTS_QUERY_KEY });
-        expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: [...PRODUCT_QUERY_KEY, 1] });
+        expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: [...PRODUCT_QUERY_KEY, VALID_UUID] });
         expect(mockDispatch).toHaveBeenCalledWith(
             expect.objectContaining({
                 payload: expect.objectContaining({ type: 'success' }),

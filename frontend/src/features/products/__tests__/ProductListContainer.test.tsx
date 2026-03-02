@@ -4,8 +4,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { ProductListContainer } from '../containers/ProductListContainer';
 import * as useProductListMock from '../hooks/useProductList';
 import * as useProductDeletionMock from '../hooks/useProductDeletion';
+import { MESSAGES } from '@/constants';
 
-// Need to mock dispatch since EmptyState fires it for "Clear filters"
 const mockDispatch = vi.fn();
 vi.mock('react-redux', () => ({
     useDispatch: () => mockDispatch,
@@ -103,7 +103,7 @@ describe('ProductListContainer', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('No products yet')).toBeDefined();
+        expect(screen.getByText(MESSAGES.PRODUCT_LIST.EMPTY_ALL)).toBeDefined();
     });
 
     it('renders empty state for filters when products exist but are filtered out', () => {
@@ -111,7 +111,7 @@ describe('ProductListContainer', () => {
             searchQuery: 'Test',
             filters: { artistName: '', limit: 12 },
             setFilters: vi.fn(),
-            allProducts: [{ id: 1, name: 'A', artistName: 'A', coverUrl: '', createdAt: '', updatedAt: '' }],
+            allProducts: [{ id: 'uuid-1', title: 'A', artistName: 'A', coverArtUrl: '', createdAt: '', updatedAt: '' }],
             filteredProducts: [], // Filtered out
             isLoading: false,
             isError: false,
@@ -127,13 +127,13 @@ describe('ProductListContainer', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('No results found in loaded products')).toBeDefined();
+        expect(screen.getByText(MESSAGES.PRODUCT_LIST.EMPTY_FILTERED)).toBeDefined();
     });
 
     it('renders product grid with products', () => {
         const mockProducts = [
-            { id: 1, name: 'Song 1', artistName: 'Artist 1', coverUrl: '', createdAt: '', updatedAt: '' },
-            { id: 2, name: 'Song 2', artistName: 'Artist 2', coverUrl: '', createdAt: '', updatedAt: '' },
+            { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', coverArtUrl: '', createdAt: '', updatedAt: '' },
+            { id: 'uuid-2', title: 'Song 2', artistName: 'Artist 2', coverArtUrl: '', createdAt: '', updatedAt: '' },
         ];
 
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
@@ -162,7 +162,7 @@ describe('ProductListContainer', () => {
 
     it('renders delete modal when a product is selected for deletion', () => {
         const mockProducts = [
-            { id: 1, name: 'Song 1', artistName: 'Artist 1', coverUrl: '', createdAt: '', updatedAt: '' },
+            { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', coverArtUrl: '', createdAt: '', updatedAt: '' },
         ];
 
         vi.mocked(useProductListMock.useProductList).mockReturnValue({

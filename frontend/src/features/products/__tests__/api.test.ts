@@ -11,6 +11,8 @@ vi.mock('@/lib/apiClient', () => ({
     },
 }));
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('productsApi', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -27,20 +29,20 @@ describe('productsApi', () => {
     });
 
     it('getById calls apiClient.get with correct URL', async () => {
-        const mockResponse = { data: { data: { id: 1, name: 'Test Product' } } };
+        const mockResponse = { data: { data: { id: VALID_UUID, title: 'Test Product' } } };
         vi.mocked(apiClient.get).mockResolvedValue(mockResponse);
 
-        await productsApi.getById(1);
+        await productsApi.getById(VALID_UUID);
 
-        expect(apiClient.get).toHaveBeenCalledWith('/api/products/1');
+        expect(apiClient.get).toHaveBeenCalledWith(`/api/products/${VALID_UUID}`);
     });
 
     it('create calls apiClient.post with FormData', async () => {
-        const mockResponse = { data: { data: { id: 1, name: 'New Product' } } };
+        const mockResponse = { data: { data: { id: VALID_UUID, title: 'New Product' } } };
         vi.mocked(apiClient.post).mockResolvedValue(mockResponse);
 
         const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const dto = { name: 'New Product', artistName: 'Artist', coverArt: mockFile };
+        const dto = { title: 'New Product', artistName: 'Artist', coverArt: mockFile };
 
         await productsApi.create(dto);
 
@@ -48,20 +50,17 @@ describe('productsApi', () => {
             '/api/products',
             expect.any(FormData)
         );
-
-        // Can't easily inspect FormData within the mock call in Vitest without custom matchers,
-        // but verifying it's FormData is sufficient for determining it hit the right path
     });
 
     it('update calls apiClient.put with FormData', async () => {
-        const mockResponse = { data: { data: { id: 1, name: 'Updated Product' } } };
+        const mockResponse = { data: { data: { id: VALID_UUID, title: 'Updated Product' } } };
         vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
 
-        const dto = { name: 'Updated Product' };
-        await productsApi.update(1, dto);
+        const dto = { title: 'Updated Product' };
+        await productsApi.update(VALID_UUID, dto);
 
         expect(apiClient.put).toHaveBeenCalledWith(
-            '/api/products/1',
+            `/api/products/${VALID_UUID}`,
             expect.any(FormData)
         );
     });
@@ -69,8 +68,8 @@ describe('productsApi', () => {
     it('delete calls apiClient.delete with correct URL', async () => {
         vi.mocked(apiClient.delete).mockResolvedValue(undefined);
 
-        await productsApi.delete(1);
+        await productsApi.delete(VALID_UUID);
 
-        expect(apiClient.delete).toHaveBeenCalledWith('/api/products/1');
+        expect(apiClient.delete).toHaveBeenCalledWith(`/api/products/${VALID_UUID}`);
     });
 });

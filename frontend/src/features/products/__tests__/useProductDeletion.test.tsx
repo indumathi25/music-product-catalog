@@ -7,6 +7,8 @@ vi.mock('../hooks/useDeleteProduct', () => ({
     useDeleteProduct: vi.fn(),
 }));
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('useProductDeletion', () => {
     const mockMutateAsync = vi.fn();
 
@@ -25,7 +27,7 @@ describe('useProductDeletion', () => {
 
     it('sets selected product on request', () => {
         const { result } = renderHook(() => useProductDeletion());
-        const product = { id: 1, name: 'Test', artistName: 'Artist' } as any;
+        const product = { id: VALID_UUID, title: 'Test', artistName: 'Artist' } as any;
 
         act(() => {
             result.current.handleDeleteRequest(product);
@@ -37,7 +39,7 @@ describe('useProductDeletion', () => {
     it('calls mutate async and clears selection on confirm', async () => {
         mockMutateAsync.mockResolvedValueOnce(undefined);
         const { result } = renderHook(() => useProductDeletion());
-        const product = { id: 1, name: 'Test', artistName: 'Artist' } as any;
+        const product = { id: VALID_UUID, title: 'Test', artistName: 'Artist' } as any;
 
         act(() => {
             result.current.handleDeleteRequest(product);
@@ -47,13 +49,13 @@ describe('useProductDeletion', () => {
             await result.current.handleDeleteConfirm();
         });
 
-        expect(mockMutateAsync).toHaveBeenCalledWith(1);
+        expect(mockMutateAsync).toHaveBeenCalledWith(VALID_UUID);
         expect(result.current.selectedProduct).toBeNull();
     });
 
     it('clears selection on cancel', () => {
         const { result } = renderHook(() => useProductDeletion());
-        const product = { id: 1, name: 'Test', artistName: 'Artist' } as any;
+        const product = { id: VALID_UUID, title: 'Test', artistName: 'Artist' } as any;
 
         act(() => {
             result.current.handleDeleteRequest(product);

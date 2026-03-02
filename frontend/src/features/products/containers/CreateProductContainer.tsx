@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { ProductForm } from '../components/ProductForm';
@@ -9,18 +8,15 @@ export function CreateProductContainer() {
     const navigate = useNavigate();
     const createMutation = useCreateProduct();
 
-    const handleSubmit = useCallback(
-        async (state: ProductFormState) => {
-            if (!state.file) return;
-            await createMutation.mutateAsync({
-                name: state.name,
-                artistName: state.artistName,
-                coverArt: state.file,
-            });
-            navigate('/');
-        },
-        [createMutation, navigate],
-    );
+    const handleSubmit = async (state: ProductFormState) => {
+        if (!state.file) return;
+        await createMutation.mutateAsync({
+            title: state.title,
+            artistName: state.artistName,
+            coverArt: state.file,
+        });
+        navigate('/');
+    };
 
     return (
         <ProductForm

@@ -1,8 +1,9 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { productsApi } from '../api';
 import { ProductFilterParams } from '../types';
+import { QUERY_KEYS } from '../../../constants';
 
-export const PRODUCTS_QUERY_KEY = ['products'] as const;
+export const PRODUCTS_QUERY_KEY = QUERY_KEYS.PRODUCTS;
 
 export function useProducts(params: Omit<ProductFilterParams, 'page'> = {}) {
     const limit = params.limit ?? 12;

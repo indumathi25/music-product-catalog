@@ -15,6 +15,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('useProducts', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -24,10 +26,10 @@ describe('useProducts', () => {
     it('fetches products on mount', async () => {
         const mockData = {
             data: [{
-                id: 1,
-                name: 'Test Product',
+                id: VALID_UUID,
+                title: 'Test Product',
                 artistName: 'Test Artist',
-                coverUrl: '',
+                coverArtUrl: '',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             }],

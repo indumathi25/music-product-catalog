@@ -27,11 +27,11 @@ export function ProductForm({
     return (
         <form onSubmit={handleSubmit} noValidate aria-label="Product form" className="space-y-6">
             <FormInput
-                id="product-name"
-                label="Product Name"
-                value={state.name}
-                onChange={(val) => handleFieldChange('name', val)}
-                error={state.errors.name}
+                id="product-title"
+                label="Product Title"
+                value={state.title}
+                onChange={(val) => handleFieldChange('title', val)}
+                error={state.errors.title}
                 placeholder="e.g. Abbey Road"
             />
 

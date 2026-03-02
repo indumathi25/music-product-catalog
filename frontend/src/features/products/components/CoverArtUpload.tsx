@@ -1,5 +1,6 @@
-import { useRef, useCallback, memo } from 'react';
-import { ACCEPTED_IMAGE_TYPES_STRING } from '@/constants';
+import { useRef } from 'react';
+import { MAX_FILE_SIZE_MB, ACCEPTED_IMAGE_TYPES_STRING } from '@/constants';
+import { UI_CONSTANTS } from '@/constants';
 
 interface CoverArtUploadProps {
     preview: string | null;
@@ -9,7 +10,7 @@ interface CoverArtUploadProps {
     onClear: () => void;
 }
 
-export const CoverArtUpload = memo(function CoverArtUpload({
+export function CoverArtUpload({
     preview,
     fileName,
     error,
@@ -18,14 +19,11 @@ export const CoverArtUpload = memo(function CoverArtUpload({
 }: CoverArtUploadProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleDrop = useCallback(
-        (e: React.DragEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file) onFileSelect(file);
-        },
-        [onFileSelect],
-    );
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file) onFileSelect(file);
+    };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
 
@@ -77,7 +75,9 @@ export const CoverArtUpload = memo(function CoverArtUpload({
                         <p id="file-hint" className="text-center text-sm text-gray-500">
                             <span className="font-medium text-violet-600">Browse</span> or drag &amp; drop
                         </p>
-                        <p className="text-xs text-gray-400">JPEG, PNG, WebP · max 5 MB</p>
+                        <p className="text-xs text-gray-400">
+                            {UI_CONSTANTS.ALLOWED_IMAGE_TYPES.map(t => t.split('/')[1].toUpperCase()).join(', ')} · max {MAX_FILE_SIZE_MB} MB
+                        </p>
                     </>
                 )}
             </div>
@@ -99,4 +99,4 @@ export const CoverArtUpload = memo(function CoverArtUpload({
             )}
         </div>
     );
-});
+}

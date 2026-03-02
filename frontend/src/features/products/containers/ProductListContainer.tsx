@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store';
 import { clearSearchQuery } from '@/store/slices/productSlice';
+import { MESSAGES } from '@/constants';
 
 export function ProductListContainer() {
     const dispatch = useDispatch<AppDispatch>();
@@ -53,15 +54,19 @@ export function ProductListContainer() {
 
     return (
         <div className="flex flex-col gap-6">
-            <ProductFilters filters={filters} onFilterChange={setFilters} />
+            <ProductFilters
+                filters={filters}
+                onFilterChange={setFilters}
+                productCount={{ loaded: allProducts.length, filtered: filteredProducts.length }}
+            />
 
             {!filteredProducts.length && !isLoading ? (
                 <EmptyState
-                    title={hasFilters ? 'No results found in loaded products' : 'No products yet'}
+                    title={hasFilters ? MESSAGES.PRODUCT_LIST.EMPTY_FILTERED : MESSAGES.PRODUCT_LIST.EMPTY_ALL}
                     description={
                         hasFilters
-                            ? 'Keep scrolling to load more products or try adjusting your filters.'
-                            : 'Add your first music product to get started.'
+                            ? MESSAGES.PRODUCT_LIST.EMPTY_FILTERED_DESC
+                            : MESSAGES.PRODUCT_LIST.EMPTY_ALL_DESC
                     }
                     action={
                         hasFilters
@@ -84,11 +89,11 @@ export function ProductListContainer() {
                         {isFetchingNextPage && (
                             <div className="flex flex-col items-center gap-2">
                                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-200 border-t-violet-600" />
-                                <span className="text-xs text-gray-500 font-medium">Loading more products...</span>
+                                <span className="text-xs text-gray-500 font-medium">{MESSAGES.PRODUCT_LIST.LOADING_MORE}</span>
                             </div>
                         )}
                         {!hasNextPage && allProducts.length > 0 && (
-                            <p className="text-sm text-gray-400 font-medium">✨ You've reached the end of the catalog</p>
+                            <p className="text-sm text-gray-400 font-medium">{MESSAGES.PRODUCT_LIST.END_OF_CATALOG}</p>
                         )}
                     </div>
                 </>

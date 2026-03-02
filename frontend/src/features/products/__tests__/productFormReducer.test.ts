@@ -13,15 +13,15 @@ describe('productFormReducer', () => {
         expect(state).toEqual(initialFormState);
     });
 
-    it('SET_FIELD updates name and clears its error', () => {
-        const withError = { ...initialFormState, errors: { name: 'Required' } };
+    it('SET_FIELD updates title and clears its error', () => {
+        const withError = { ...initialFormState, errors: { title: 'Required' } };
         const next = productFormReducer(withError, {
             type: 'SET_FIELD',
-            field: 'name',
+            field: 'title',
             value: 'Abbey Road',
         });
-        expect(next.name).toBe('Abbey Road');
-        expect(next.errors.name).toBeUndefined();
+        expect(next.title).toBe('Abbey Road');
+        expect(next.errors.title).toBeUndefined();
     });
 
     it('SET_FILE stores file and preview', () => {
@@ -49,7 +49,7 @@ describe('productFormReducer', () => {
     });
 
     it('RESET returns to initial state', () => {
-        const dirty = { ...initialFormState, name: 'Test', isSubmitting: true };
+        const dirty = { ...initialFormState, title: 'Test', isSubmitting: true };
         const next = productFormReducer(dirty, { type: 'RESET' });
         expect(next).toEqual(initialFormState);
     });
@@ -58,14 +58,14 @@ describe('productFormReducer', () => {
 describe('validateForm', () => {
     it('returns errors for empty fields', () => {
         const errors = validateForm(initialFormState, true);
-        expect(errors.name).toBeDefined();
+        expect(errors.title).toBeDefined();
         expect(errors.artistName).toBeDefined();
         expect(errors.file).toBeDefined();
     });
 
     it('passes when all fields are filled', () => {
         const file = new File(['x'], 'cover.jpg', { type: ALLOWED_IMAGE_TYPES[0] });
-        const state = { ...initialFormState, name: 'Abbey Road', artistName: 'The Beatles', file };
+        const state = { ...initialFormState, title: 'Abbey Road', artistName: 'The Beatles', file };
         const errors = validateForm(state, true);
         expect(Object.keys(errors)).toHaveLength(0);
     });

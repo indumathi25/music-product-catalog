@@ -56,7 +56,7 @@ export function Navbar() {
                                     type="text"
                                     value={searchQuery}
                                     onChange={handleSearch}
-                                    className="w-full bg-gray-800 text-white border-none rounded-md py-2 pl-10 pr-4 focus:ring-2 focus:ring-yellow-500 placeholder-gray-400"
+                                    className="w-full bg-gray-800 text-white border-none rounded-md py-2 pl-10 pr-4 focus:ring-2 focus:ring-yellow-500 placeholder-gray-300"
                                     placeholder="Search by album name..."
                                     aria-label="Search"
                                 />

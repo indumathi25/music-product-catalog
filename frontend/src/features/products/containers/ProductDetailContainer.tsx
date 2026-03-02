@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProduct } from '../hooks/useProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
@@ -10,36 +10,33 @@ import { ProductFormState } from '../reducers/productFormReducer';
 export function ProductDetailContainer() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const productId = id ? parseInt(id, 10) : undefined;
+    const productId = id;
 
     const [isEditing, setIsEditing] = useState(false);
 
     const { data: product, isLoading: isFetching, isError } = useProduct(productId);
     const updateMutation = useUpdateProduct();
 
-    const handleSubmit = useCallback(
-        async (state: ProductFormState) => {
-            if (!productId) return;
-            await updateMutation.mutateAsync({
-                id: productId,
-                dto: {
-                    name: state.name,
-                    artistName: state.artistName,
-                    coverArt: state.file || undefined,
-                },
-            });
-            setIsEditing(false); // Return to view mode after save
-        },
-        [productId, updateMutation],
-    );
-
-    const handleCancel = useCallback(() => {
+    const handleSubmit = async (state: ProductFormState) => {
+        if (!productId) return;
+        await updateMutation.mutateAsync({
+            id: productId,
+            dto: {
+                title: state.title,
+                artistName: state.artistName,
+                coverArt: state.file || undefined,
+            },
+        });
         setIsEditing(false);
-    }, []);
+    };
 
-    const handleBack = useCallback(() => {
+    const handleCancel = () => {
+        setIsEditing(false);
+    };
+
+    const handleBack = () => {
         navigate('/');
-    }, [navigate]);
+    };
 
     if (isFetching) {
         return (

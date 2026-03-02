@@ -1,5 +1,22 @@
+# ── Development stage ──────────────────────────────────────────────────────────
+FROM node:22-alpine AS dev
+
+WORKDIR /app
+RUN npm install -g npm@11.11.0
+
+# Install deps first (cached layer)
+COPY package*.json ./
+RUN npm ci
+
+# Copy all config files Vite needs (src/ will be overridden by volume at runtime)
+COPY . .
+
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host"]
+
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
+
 
 WORKDIR /app
 

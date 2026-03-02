@@ -26,6 +26,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('useCreateProduct', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -34,13 +36,13 @@ describe('useCreateProduct', () => {
     });
 
     it('creates a product and invalidates cache', async () => {
-        const mockProduct = { id: 1, name: 'New Product' };
+        const mockProduct = { id: VALID_UUID, title: 'New Product' };
         vi.mocked(productsApi.create).mockResolvedValue(mockProduct as any);
 
         const { result } = renderHook(() => useCreateProduct(), { wrapper });
 
         const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const dto = { name: 'New Product', artistName: 'Artist', coverArt: mockFile };
+        const dto = { title: 'New Product', artistName: 'Artist', coverArt: mockFile };
 
         result.current.mutate(dto);
 
@@ -62,7 +64,7 @@ describe('useCreateProduct', () => {
         const { result } = renderHook(() => useCreateProduct(), { wrapper });
 
         const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const dto = { name: 'New Product', artistName: 'Artist', coverArt: mockFile };
+        const dto = { title: 'New Product', artistName: 'Artist', coverArt: mockFile };
 
         result.current.mutate(dto);
 

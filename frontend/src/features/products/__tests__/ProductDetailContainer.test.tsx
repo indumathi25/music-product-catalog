@@ -13,14 +13,16 @@ vi.mock('../hooks/useUpdateProduct', () => ({
     useUpdateProduct: vi.fn(),
 }));
 
+const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
+
 describe('ProductDetailContainer', () => {
     const mockUpdateMutateAsync = vi.fn();
 
     const mockProduct = {
-        id: 1,
-        name: 'Test Song',
+        id: VALID_UUID,
+        title: 'Test Song',
         artistName: 'Test Artist',
-        coverUrl: 'http://localhost/cover.jpg',
+        coverArtUrl: 'http://localhost/cover.jpg',
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
     };
@@ -41,7 +43,7 @@ describe('ProductDetailContainer', () => {
 
     const renderComponent = () => {
         return render(
-            <MemoryRouter initialEntries={['/product/1']}>
+            <MemoryRouter initialEntries={[`/product/${VALID_UUID}`]}>
                 <Routes>
                     <Route path="/product/:id" element={<ProductDetailContainer />} />
                 </Routes>
@@ -62,7 +64,7 @@ describe('ProductDetailContainer', () => {
         fireEvent.click(screen.getByRole('button', { name: /Edit/i }));
 
         // Form should now be rendered
-        expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Test Song');
+        expect(screen.getByLabelText(/Product Title/i)).toHaveValue('Test Song');
         expect(screen.getByRole('button', { name: /Save Changes/i })).toBeDefined();
         expect(screen.getByRole('button', { name: /Cancel/i })).toBeDefined();
     });
@@ -74,21 +76,19 @@ describe('ProductDetailContainer', () => {
         // Enter edit mode
         fireEvent.click(screen.getByRole('button', { name: /Edit/i }));
 
-        // Change name
-        fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'Updated Song' } });
+        // Change title
+        fireEvent.change(screen.getByLabelText(/Product Title/i), { target: { value: 'Updated Song' } });
 
         // Save
         fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
 
         await waitFor(() => {
             expect(mockUpdateMutateAsync).toHaveBeenCalledWith({
-                id: 1,
-                dto: expect.objectContaining({ name: 'Updated Song' }),
+                id: VALID_UUID,
+                dto: expect.objectContaining({ title: 'Updated Song' }),
             });
         });
 
-        // Mocking useProduct logic means it won't actually re-render Test Song automatically here
-        // unless we update the mock and re-render or the component local state reverts.
         // It should exit edit mode immediately and show the edit button again.
         await waitFor(() => {
             expect(screen.queryByRole('button', { name: /Save Changes/i })).toBeNull();

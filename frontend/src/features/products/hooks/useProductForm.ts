@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect } from 'react';
+import { useReducer, useCallback, useEffect, type SubmitEvent } from 'react';
 import {
     productFormReducer,
     initialFormState,
@@ -23,7 +23,7 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
     }, [initialData]);
 
     const handleFile = useCallback((file: File) => {
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
             dispatch({
                 type: 'SET_ERRORS',
                 errors: { file: 'Only JPEG, PNG, and WebP images are allowed' },
@@ -40,7 +40,7 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         reader.readAsDataURL(file);
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const isUpdate = !!initialData;
         const errors = validateForm(state, !isUpdate);
@@ -59,7 +59,7 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         }
     };
 
-    const handleFieldChange = useCallback((field: 'name' | 'artistName', value: string) => {
+    const handleFieldChange = useCallback((field: 'title' | 'artistName', value: string) => {
         dispatch({ type: 'SET_FIELD', field, value });
     }, []);
 

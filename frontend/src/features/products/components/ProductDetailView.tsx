@@ -13,9 +13,12 @@ export function ProductDetailView({ product, onEdit, onBack }: ProductDetailView
             <div className="w-full md:w-1/2 lg:w-2/5">
                 <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100 shadow-lg ring-1 ring-gray-200">
                     <img
-                        src={product.coverUrl}
-                        alt={product.name}
+                        src={product.coverArtUrl}
+                        alt={product.title}
                         className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                        {...({ fetchPriority: 'high' } as any)}
+                        width={600}
+                        height={600}
                     />
                 </div>
             </div>
@@ -32,7 +35,7 @@ export function ProductDetailView({ product, onEdit, onBack }: ProductDetailView
                         </svg>
                         Back to Catalog
                     </button>
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{product.name}</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{product.title}</h1>
                     <p className="mt-2 text-xl font-medium text-violet-600">{product.artistName}</p>
                 </div>
 

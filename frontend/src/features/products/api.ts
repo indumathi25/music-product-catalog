@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/apiClient';
+import { API_PATHS } from '../../constants';
 import {
     Product,
     CreateProductDto,
@@ -10,36 +11,36 @@ import {
 
 export const productsApi = {
     getAll: async (params?: ProductFilterParams, signal?: AbortSignal): Promise<ApiListResponse<Product>> => {
-        return apiClient.get<ApiListResponse<Product>>('/api/products', params as Record<string, unknown>, signal);
+        return apiClient.get<ApiListResponse<Product>>(API_PATHS.PRODUCTS.BASE, params as Record<string, unknown>, signal);
     },
 
-    getById: async (id: number): Promise<Product> => {
-        const response = await apiClient.get<ApiSingleResponse<Product>>(`/api/products/${id}`);
+    getById: async (id: string): Promise<Product> => {
+        const response = await apiClient.get<ApiSingleResponse<Product>>(API_PATHS.PRODUCTS.BY_ID(id));
         return response.data;
     },
 
     create: async (dto: CreateProductDto): Promise<Product> => {
         const form = new FormData();
-        form.append('name', dto.name);
+        form.append('title', dto.title);
         form.append('artistName', dto.artistName);
         form.append('coverArt', dto.coverArt);
-        const response = await apiClient.post<ApiSingleResponse<Product>>('/api/products', form);
+        const response = await apiClient.post<ApiSingleResponse<Product>>(API_PATHS.PRODUCTS.BASE, form);
         return response.data;
     },
 
-    update: async (id: number, dto: UpdateProductDto): Promise<Product> => {
+    update: async (id: string, dto: UpdateProductDto): Promise<Product> => {
         const form = new FormData();
-        if (dto.name) form.append('name', dto.name);
+        if (dto.title) form.append('title', dto.title);
         if (dto.artistName) form.append('artistName', dto.artistName);
         if (dto.coverArt) form.append('coverArt', dto.coverArt);
         const response = await apiClient.put<ApiSingleResponse<Product>>(
-            `/api/products/${id}`,
+            API_PATHS.PRODUCTS.BY_ID(id),
             form,
         );
         return response.data;
     },
 
-    delete: async (id: number): Promise<void> => {
-        await apiClient.delete(`/api/products/${id}`);
+    delete: async (id: string): Promise<void> => {
+        await apiClient.delete(API_PATHS.PRODUCTS.BY_ID(id));
     },
 };

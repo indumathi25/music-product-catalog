@@ -1,20 +1,20 @@
 export interface Product {
-    id: number;
-    name: string;
+    id: string;
+    title: string;
     artistName: string;
-    coverUrl: string;
+    coverArtUrl: string;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateProductDto {
-    name: string;
+    title: string;
     artistName: string;
     coverArt: File;
 }
 
 export interface UpdateProductDto {
-    name?: string;
+    title?: string;
     artistName?: string;
     coverArt?: File;
 }
