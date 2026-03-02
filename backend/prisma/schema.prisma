@@ -10,16 +10,26 @@ generator client {
   binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
-model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  artist_name String
-  cover_url   String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+model Artist {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  products   Product[]
+  created_at DateTime  @default(now())
 
-  @@index([name])
-  @@index([artist_name])
+  @@map("artists")
+}
+
+model Product {
+  id             String   @id @default(uuid())
+  artist_id      String
+  artist         Artist   @relation(fields: [artist_id], references: [id], onDelete: Cascade)
+  title          String
+  cover_art_url  String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@index([artist_id])
+  @@index([title])
   @@index([created_at])
   @@map("products")
 }

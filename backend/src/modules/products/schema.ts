@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createProductSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(200, 'Name must be at most 200 characters'),
+    title: z.string().min(1, 'Title is required').max(200, 'Title must be at most 200 characters'),
     artistName: z
         .string()
         .min(1, 'Artist name is required')
@@ -9,10 +9,10 @@ export const createProductSchema = z.object({
 });
 
 export const updateProductSchema = z.object({
-    name: z
+    title: z
         .string()
-        .min(1, 'Name is required')
-        .max(200, 'Name must be at most 200 characters')
+        .min(1, 'Title is required')
+        .max(200, 'Title must be at most 200 characters')
         .optional(),
     artistName: z
         .string()
@@ -22,7 +22,7 @@ export const updateProductSchema = z.object({
 });
 
 export const productIdSchema = z.object({
-    id: z.coerce.number().int().positive(),
+    id: z.string().uuid('Invalid product ID'),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;

@@ -1,12 +1,36 @@
-import fs from 'fs/promises'; // Use promises for non-blocking I/O
+import fs from 'fs/promises';
 import path from 'path';
+import sharp from 'sharp';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { env } from '../config/env';
 import { logger } from './logger';
+import { StorageConstants } from '../constants';
 
 export interface IStorageService {
     uploadFile(file: Express.Multer.File): Promise<string>;
     deleteFile(url: string): Promise<void>;
+}
+
+const OPTIMIZATION_CONFIG = {
+    maxWidth: 600,
+    maxHeight: 600,
+    quality: 70,
+    format: 'webp' as const,
+};
+
+/**
+ * Common image optimization logic
+ */
+async function optimizeImage(buffer: Buffer): Promise<Buffer> {
+    return sharp(buffer)
+        .resize({
+            width: OPTIMIZATION_CONFIG.maxWidth,
+            height: OPTIMIZATION_CONFIG.maxHeight,
+            fit: 'inside',
+            withoutEnlargement: true,
+        })
+        .toFormat(OPTIMIZATION_CONFIG.format, { quality: OPTIMIZATION_CONFIG.quality })
+        .toBuffer();
 }
 
 /**
@@ -16,19 +40,24 @@ class LocalStorageService implements IStorageService {
     private readonly uploadsDir = path.resolve(env.UPLOADS_DIR);
 
     async uploadFile(file: Express.Multer.File): Promise<string> {
-        // Multer handles the physical write; we just provide the public path
-        return `/uploads/${file.filename}`;
+        const optimizedBuffer = await optimizeImage(file.buffer);
+        const filename = `cover-${Date.now()}-${Math.floor(Math.random() * 1e9)}.webp`;
+        const filePath = path.join(this.uploadsDir, filename);
+
+        await fs.writeFile(filePath, optimizedBuffer);
+        logger.info({ filePath, filename }, 'Local file uploaded successfully');
+        return `${StorageConstants.LOCAL_UPLOADS_PATH}${filename}`;
     }
 
     async deleteFile(url: string): Promise<void> {
         try {
-            const filename = url.split('/uploads/')[1];
+            const filename = url.split(StorageConstants.LOCAL_UPLOADS_PATH)[1];
             if (!filename) return;
 
             const filePath = path.join(this.uploadsDir, filename);
-            await fs.unlink(filePath); // Async delete
+            await fs.unlink(filePath);
         } catch (err: any) {
-            if (err.code !== 'ENOENT') { // Ignore if file already gone
+            if (err.code !== 'ENOENT') {
                 logger.error({ err, url }, 'Failed to delete local file');
             }
         }
@@ -63,13 +92,15 @@ class S3StorageService implements IStorageService {
     }
 
     async uploadFile(file: Express.Multer.File): Promise<string> {
-        const key = `covers/cover-${Date.now()}-${Math.floor(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+        const optimizedBuffer = await optimizeImage(file.buffer);
+        const key = `${StorageConstants.S3_COVERS_PREFIX}cover-${Date.now()}-${Math.floor(Math.random() * 1e9)}.webp`;
 
         await this.client.send(new PutObjectCommand({
             Bucket: this.bucket,
             Key: key,
-            Body: file.buffer,
-            ContentType: file.mimetype,
+            Body: optimizedBuffer,
+            ContentType: 'image/webp',
+            CacheControl: 'public, max-age=31536000, immutable',
         }));
 
         return `https://${this.bucket}.s3.${env.S3_REGION}.amazonaws.com/${key}`;

@@ -22,6 +22,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: ${BACKEND_TARGET:-production}
     container_name: fuga-backend
     restart: unless-stopped
     env_file:
@@ -29,10 +30,12 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@db:5432/fuga}
       UPLOADS_DIR: ${UPLOADS_DIR:-/app/uploads}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
-      - "4000:4000"
+      - "${BACKEND_PORT:-4000}:4000"
     volumes:
+      - ./backend:/app
+      - /app/node_modules
       - uploads_data:/app/uploads
     depends_on:
       db:
@@ -43,18 +46,20 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
-    command: sh -c "npx prisma migrate deploy && node dist/server.js"
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ""
+      target: ${FRONTEND_TARGET:-production}
     container_name: fuga-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT_MAPPING:-3000:80}"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/dist
     depends_on:
       backend:
         condition: service_healthy

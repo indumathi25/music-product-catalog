@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import path from 'path';
 import fs from 'fs';
 import yaml from 'js-yaml';
@@ -13,6 +14,8 @@ import { logger } from './lib/logger';
 import { globalLimiter } from './middlewares/rateLimiter';
 
 const app = express();
+
+app.use(compression());
 
 // Security Headers
 app.use(
@@ -59,7 +62,11 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static(path.resolve(env.UPLOADS_DIR)));
+app.use('/uploads', express.static(path.resolve(env.UPLOADS_DIR), {
+    maxAge: '1y',
+    immutable: true,
+    fallthrough: false,
+}));
 
 // Load OpenAPI spec from YAML
 let swaggerSpec: any;

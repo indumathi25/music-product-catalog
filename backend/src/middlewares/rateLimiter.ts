@@ -2,13 +2,13 @@ import { rateLimit } from 'express-rate-limit';
 
 /**
  * Global API rate limiter
- * Limits each IP to 100 requests per 15 minutes
+ * Limits each IP to 1000 requests per 15 minutes
  */
 export const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100, // Limit each IP to 100 requests per windowMs
-    standardHeaders: 'draft-7', // Use standard headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    windowMs: 15 * 60 * 1000,
+    limit: 1000,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
     message: {
         error: {
             code: 'TOO_MANY_REQUESTS',
@@ -23,7 +23,7 @@ export const globalLimiter = rateLimit({
  */
 export const writeLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 20,
+    limit: 100,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: {

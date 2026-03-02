@@ -1,29 +1,36 @@
-export interface Product {
-    id: number;
+export interface Artist {
+    id: string;
     name: string;
-    artist_name: string;
-    cover_url: string;
+    created_at: Date;
+}
+
+export interface Product {
+    id: string;
+    artist_id: string;
+    title: string;
+    cover_art_url: string;
     created_at: Date;
     updated_at: Date;
+    artist?: Artist;
 }
 
 export interface CreateProductDto {
-    name: string;
+    title: string;
     artistName: string;
-    coverUrl: string;
+    coverArtUrl: string;
 }
 
 export interface UpdateProductDto {
-    name?: string;
+    title?: string;
     artistName?: string;
-    coverUrl?: string;
+    coverArtUrl?: string;
 }
 
 export interface ProductResponse {
-    id: number;
-    name: string;
+    id: string;
+    title: string;
     artistName: string;
-    coverUrl: string;
+    coverArtUrl: string;
     createdAt: string;
     updatedAt: string;
 }

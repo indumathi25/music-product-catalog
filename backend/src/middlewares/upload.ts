@@ -13,22 +13,10 @@ if (env.STORAGE_PROVIDER !== 's3' && !fs.existsSync(UPLOADS_DIR)) {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
-/**
- * Generates a consistent, unique filename
- */
-const generateFilename = (file: Express.Multer.File) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const ext = path.extname(file.originalname).toLowerCase();
-    return `cover-${uniqueSuffix}${ext}`;
-};
-
 // Define Storage Strategies
 const storageStrategies = {
     s3: multer.memoryStorage(),
-    local: multer.diskStorage({
-        destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-        filename: (_req, file, cb) => cb(null, generateFilename(file)),
-    }),
+    local: multer.memoryStorage(),
 };
 
 const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {

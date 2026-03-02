@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { productService } from './service';
-import { CreateProductInput, UpdateProductInput } from './schema';
+import { CreateProductInput, UpdateProductInput, ProductIdParam } from './schema';
 import { AppError } from '../../middlewares/errorHandler';
 import { storageService } from '../../lib/storage';
 
@@ -14,6 +14,13 @@ export const productController = {
                 limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
             };
             const result = await productService.getAll(query);
+
+            // Add Link header for LCP preload of the first product image
+            if (result.data.length > 0) {
+                const firstProduct = result.data[0];
+                res.setHeader('Link', `<${firstProduct.coverArtUrl}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
+            }
+
             res.json(result);
         } catch (err) {
             next(err);
@@ -22,7 +29,12 @@ export const productController = {
 
     getById: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const product = await productService.getById(Number(req.params['id']));
+            const { id } = req.params as unknown as ProductIdParam;
+            const product = await productService.getById(id);
+
+            // Preload the main image for the detail view
+            res.setHeader('Link', `<${product.coverArtUrl}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
+
             res.json({ data: product });
         } catch (err) {
             next(err);
@@ -37,9 +49,9 @@ export const productController = {
             const body = req.body as CreateProductInput;
             const coverUrl = await storageService.uploadFile(req.file);
             const product = await productService.create({
-                name: body.name,
+                title: body.title,
                 artistName: body.artistName,
-                coverUrl,
+                coverArtUrl: coverUrl,
             });
             res.status(201).json({ data: product });
         } catch (err) {
@@ -49,12 +61,13 @@ export const productController = {
 
     update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
+            const { id } = req.params as unknown as ProductIdParam;
             const body = req.body as UpdateProductInput;
-            const coverUrl = req.file ? await storageService.uploadFile(req.file) : undefined;
-            const product = await productService.update(Number(req.params['id']), {
-                name: body.name,
+            const coverArtUrl = req.file ? await storageService.uploadFile(req.file) : undefined;
+            const product = await productService.update(id, {
+                title: body.title,
                 artistName: body.artistName,
-                coverUrl,
+                coverArtUrl,
             });
             res.json({ data: product });
         } catch (err) {
@@ -64,7 +77,8 @@ export const productController = {
 
     delete: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            await productService.delete(Number(req.params['id']));
+            const { id } = req.params as unknown as ProductIdParam;
+            await productService.delete(id);
             res.status(204).send();
         } catch (err) {
             next(err);

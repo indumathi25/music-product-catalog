@@ -9,10 +9,10 @@ const mockService = productService as jest.Mocked<typeof productService>;
 const AUTH_HEADER = { 'x-api-key': process.env.API_KEY ?? 'fuga_secret_key_2026' };
 
 const sampleProduct = {
-    id: 1,
-    name: 'Abbey Road',
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    title: 'Abbey Road',
     artistName: 'The Beatles',
-    coverUrl: 'http://localhost:4000/uploads/cover-test.jpg',
+    coverArtUrl: 'http://localhost:4000/uploads/cover-test.jpg',
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
 };
@@ -38,8 +38,8 @@ describe('Product Routes', () => {
             expect(res.body.data.id).toBe(sampleProduct.id);
         });
 
-        it('returns 400 for non-numeric ID', async () => {
-            const res = await request(app).get('/api/products/abc');
+        it('returns 400 for invalid ID format', async () => {
+            const res = await request(app).get('/api/products/not-a-uuid');
             expect(res.status).toBe(400);
             expect(res.body.error.code).toBe('VALIDATION_ERROR');
         });

@@ -1,5 +1,6 @@
 import { productRepository } from './repository';
 import { AppError } from '../../middlewares/errorHandler';
+import { HttpStatus, ErrorCodes } from '../../constants';
 import { storageService } from '../../lib/storage';
 import { productMapper } from './mapper';
 import { ProductResponse, CreateProductDto, UpdateProductDto, GetAllProductsQuery, PaginatedResponse } from './types';
@@ -21,10 +22,10 @@ export const productService = {
         };
     },
 
-    getById: async (id: number): Promise<ProductResponse> => {
+    getById: async (id: string): Promise<ProductResponse> => {
         const product = await productRepository.findById(id);
         if (!product) {
-            throw new AppError(404, 'PRODUCT_NOT_FOUND', `Product with id '${id}' not found`);
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorCodes.PRODUCT_NOT_FOUND, `Product with id '${id}' not found`);
         }
         return productMapper.toResponse(product);
     },
@@ -34,31 +35,31 @@ export const productService = {
         return productMapper.toResponse(product);
     },
 
-    update: async (id: number, data: UpdateProductDto): Promise<ProductResponse> => {
+    update: async (id: string, data: UpdateProductDto): Promise<ProductResponse> => {
         const existing = await productRepository.findById(id);
         if (!existing) {
-            throw new AppError(404, 'PRODUCT_NOT_FOUND', `Product with id '${id}' not found`);
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorCodes.PRODUCT_NOT_FOUND, `Product with id '${id}' not found`);
         }
 
         const updated = await productRepository.update(id, data);
 
         // Remove old image only AFTER successful DB update
-        if (data.coverUrl && existing.cover_url !== data.coverUrl) {
+        if (data.coverArtUrl && existing.cover_art_url !== data.coverArtUrl) {
             try {
-                await storageService.deleteFile(existing.cover_url);
+                await storageService.deleteFile(existing.cover_art_url);
             } catch (err) {
                 // Log but don't fail the request since DB update was successful
-                console.error(`Failed to delete old file ${existing.cover_url}:`, err);
+                console.error(`Failed to delete old file ${existing.cover_art_url}:`, err);
             }
         }
 
         return productMapper.toResponse(updated);
     },
 
-    delete: async (id: number): Promise<void> => {
+    delete: async (id: string): Promise<void> => {
         const existing = await productRepository.findById(id);
         if (!existing) {
-            throw new AppError(404, 'PRODUCT_NOT_FOUND', `Product with id '${id}' not found`);
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorCodes.PRODUCT_NOT_FOUND, `Product with id '${id}' not found`);
         }
 
         // 1. Delete DB record first
@@ -66,9 +67,9 @@ export const productService = {
 
         // 2. Cleanup storage second
         try {
-            await storageService.deleteFile(existing.cover_url);
+            await storageService.deleteFile(existing.cover_art_url);
         } catch (err) {
-            console.error(`Failed to cleanup file ${existing.cover_url} after product deletion:`, err);
+            console.error(`Failed to cleanup file ${existing.cover_art_url} after product deletion:`, err);
         }
     },
 };

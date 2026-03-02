@@ -16,17 +16,18 @@ export const productRepository = {
                 search
                     ? {
                         OR: [
-                            { name: { contains: search, mode: 'insensitive' } },
-                            { artist_name: { contains: search, mode: 'insensitive' } },
+                            { title: { contains: search, mode: 'insensitive' } },
+                            { artist: { name: { contains: search, mode: 'insensitive' } } },
                         ],
                     }
                     : {},
-                artistName ? { artist_name: { equals: artistName, mode: 'insensitive' } } : {},
+                artistName ? { artist: { name: { equals: artistName, mode: 'insensitive' } } } : {},
             ],
         };
 
         return prisma.product.findMany({
             where,
+            include: { artist: true },
             orderBy: { created_at: 'desc' },
             skip,
             take,
@@ -41,46 +42,64 @@ export const productRepository = {
                 search
                     ? {
                         OR: [
-                            { name: { contains: search, mode: 'insensitive' } },
-                            { artist_name: { contains: search, mode: 'insensitive' } },
+                            { title: { contains: search, mode: 'insensitive' } },
+                            { artist: { name: { contains: search, mode: 'insensitive' } } },
                         ],
                     }
                     : {},
-                artistName ? { artist_name: { equals: artistName, mode: 'insensitive' } } : {},
+                artistName ? { artist: { name: { equals: artistName, mode: 'insensitive' } } } : {},
             ],
         };
 
         return prisma.product.count({ where });
     },
 
-    findById: async (id: number): Promise<Product | null> => {
+    findById: async (id: string): Promise<Product | null> => {
         return prisma.product.findUnique({
             where: { id },
+            include: { artist: true },
         }) as unknown as Product | null;
     },
 
     create: async (data: CreateProductDto): Promise<Product> => {
         return prisma.product.create({
             data: {
-                name: data.name,
-                artist_name: data.artistName,
-                cover_url: data.coverUrl,
+                title: data.title,
+                cover_art_url: data.coverArtUrl,
+                artist: {
+                    connectOrCreate: {
+                        where: { name: data.artistName },
+                        create: { name: data.artistName },
+                    },
+                },
             },
+            include: { artist: true },
         }) as unknown as Product;
     },
 
-    update: async (id: number, data: UpdateProductDto): Promise<Product> => {
+    update: async (id: string, data: UpdateProductDto): Promise<Product> => {
+        const updateData: Prisma.ProductUpdateInput = {
+            ...(data.title !== undefined && { title: data.title }),
+            ...(data.coverArtUrl !== undefined && { cover_art_url: data.coverArtUrl }),
+        };
+
+        if (data.artistName !== undefined) {
+            updateData.artist = {
+                connectOrCreate: {
+                    where: { name: data.artistName },
+                    create: { name: data.artistName },
+                },
+            };
+        }
+
         return prisma.product.update({
             where: { id },
-            data: {
-                ...(data.name !== undefined && { name: data.name }),
-                ...(data.artistName !== undefined && { artist_name: data.artistName }),
-                ...(data.coverUrl !== undefined && { cover_url: data.coverUrl }),
-            },
+            data: updateData,
+            include: { artist: true },
         }) as unknown as Product;
     },
 
-    delete: async (id: number): Promise<Product> => {
+    delete: async (id: string): Promise<Product> => {
         return prisma.product.delete({
             where: { id },
         }) as unknown as Product;

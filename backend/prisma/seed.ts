@@ -1,8 +1,6 @@
-import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/lib/prisma';
 import { storageService } from '../src/lib/storage';
-
-const prisma = new PrismaClient();
+import { Buffer } from 'buffer';
 
 const products = [
     { name: 'Abbey Road', artist: 'The Beatles' },
@@ -60,8 +58,9 @@ const products = [
 async function main() {
     console.log(`Seeding ${products.length} products...`);
 
-    // Clear existing products to ensure a clean state with S3 images
+    // 1. Clean data
     await prisma.product.deleteMany();
+    await prisma.artist.deleteMany();
 
     for (let i = 0; i < products.length; i++) {
         const p = products[i];
@@ -81,16 +80,21 @@ async function main() {
             const s3Url = await storageService.uploadFile({
                 buffer,
                 mimetype: 'image/jpeg',
-                originalname: `${p.name.replace(/\s+/g, '-').toLowerCase()}.jpg`,
+                originalname: `${p.name.replace(/\s+/g, '-').toLowerCase()}.webp`,
                 size: buffer.byteLength,
             } as any);
 
-            // 3. Create DB record
+            // 3. Create DB record with Join
             await prisma.product.create({
                 data: {
-                    name: p.name,
-                    artist_name: p.artist,
-                    cover_url: s3Url,
+                    title: p.name,
+                    cover_art_url: s3Url,
+                    artist: {
+                        connectOrCreate: {
+                            where: { name: p.artist },
+                            create: { name: p.artist },
+                        },
+                    },
                 },
             });
         } catch (error) {
@@ -98,7 +102,7 @@ async function main() {
         }
     }
 
-    console.log('Successfully seeded products to DB and S3! 🎸');
+    console.log('Successfully seeded normalized products! 🎸');
 }
 
 main()

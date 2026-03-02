@@ -7,10 +7,10 @@ jest.mock('../repository');
 const mockRepo = productRepository as jest.Mocked<typeof productRepository>;
 
 const mockProduct = {
-    id: 1,
-    name: 'Abbey Road',
-    artist_name: 'The Beatles',
-    cover_url: 'http://localhost:4000/uploads/cover-test.jpg',
+    id: 'uuid-1',
+    title: 'Abbey Road',
+    artist: { name: 'The Beatles' },
+    cover_art_url: 'http://localhost:4000/uploads/cover-test.jpg',
     created_at: new Date('2024-01-01'),
     updated_at: new Date('2024-01-01'),
 };
@@ -31,9 +31,9 @@ describe('productService', () => {
             expect(result.data).toHaveLength(1);
             expect(result.data[0]).toMatchObject({
                 id: mockProduct.id,
-                name: mockProduct.name,
-                artistName: mockProduct.artist_name,
-                coverUrl: mockProduct.cover_url,
+                title: mockProduct.title,
+                artistName: mockProduct.artist.name,
+                coverArtUrl: mockProduct.cover_art_url,
             });
         });
     });
@@ -41,8 +41,8 @@ describe('productService', () => {
     describe('getById', () => {
         it('should throw 404 when product not found', async () => {
             mockRepo.findById.mockResolvedValue(null as never);
-            await expect(productService.getById(999)).rejects.toThrow(AppError);
-            await expect(productService.getById(999)).rejects.toMatchObject({
+            await expect(productService.getById('non-existent')).rejects.toThrow(AppError);
+            await expect(productService.getById('non-existent')).rejects.toMatchObject({
                 statusCode: 404,
                 code: 'PRODUCT_NOT_FOUND',
             });
@@ -52,7 +52,7 @@ describe('productService', () => {
             mockRepo.findById.mockResolvedValue(mockProduct as never);
             const result = await productService.getById(mockProduct.id);
             expect(result.id).toBe(mockProduct.id);
-            expect(result.artistName).toBe(mockProduct.artist_name);
+            expect(result.artistName).toBe(mockProduct.artist.name);
         });
     });
 
@@ -60,19 +60,19 @@ describe('productService', () => {
         it('should create a product and return it', async () => {
             mockRepo.create.mockResolvedValue(mockProduct as never);
             const result = await productService.create({
-                name: 'Abbey Road',
+                title: 'Abbey Road',
                 artistName: 'The Beatles',
-                coverUrl: 'http://localhost:4000/uploads/cover-test.jpg',
+                coverArtUrl: 'http://localhost:4000/uploads/cover-test.jpg',
             });
             expect(mockRepo.create).toHaveBeenCalledTimes(1);
-            expect(result.name).toBe('Abbey Road');
+            expect(result.title).toBe('Abbey Road');
         });
     });
 
     describe('delete', () => {
         it('should throw 404 when deleting non-existent product', async () => {
             mockRepo.findById.mockResolvedValue(null as never);
-            await expect(productService.delete(999)).rejects.toMatchObject({
+            await expect(productService.delete('non-existent')).rejects.toMatchObject({
                 statusCode: 404,
             });
         });
