@@ -16,7 +16,7 @@ export function ProductDetailView({ product, onEdit, onBack }: ProductDetailView
                         src={product.coverArtUrl}
                         alt={product.title}
                         className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                        {...({ fetchPriority: 'high' } as any)}
+                        fetchPriority="high"
                         width={600}
                         height={600}
                     />

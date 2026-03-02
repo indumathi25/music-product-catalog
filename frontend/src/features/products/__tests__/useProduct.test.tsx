@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useProduct } from '../hooks/useProduct';
 import { productsApi } from '../api';
+import { Product } from '../types';
 
 vi.mock('../api', () => ({
     productsApi: {
@@ -28,8 +29,15 @@ describe('useProduct', () => {
     });
 
     it('fetches a single product when id is provided', async () => {
-        const mockProduct = { id: VALID_UUID, title: 'Test Product' };
-        vi.mocked(productsApi.getById).mockResolvedValue(mockProduct as any);
+        const mockProduct: Product = {
+            id: VALID_UUID,
+            title: 'Test Product',
+            artistName: 'Artist',
+            coverArtUrl: 'http://example.com/art.jpg',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        vi.mocked(productsApi.getById).mockResolvedValue(mockProduct);
 
         const { result } = renderHook(() => useProduct(VALID_UUID), { wrapper });
 

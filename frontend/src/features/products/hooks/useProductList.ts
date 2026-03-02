@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
@@ -32,13 +32,11 @@ export function useProductList() {
         }
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    const allProducts = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data?.pages]);
+    const allProducts = data?.pages.flatMap((page) => page.data) ?? [];
 
-    const filteredProducts = useMemo(() => {
-        return allProducts.filter((product: Product) => {
-            return !filters.artistName || product.artistName.toLowerCase().includes(filters.artistName.toLowerCase());
-        });
-    }, [allProducts, filters.artistName]);
+    const filteredProducts = allProducts.filter((product: Product) => {
+        return !filters.artistName || product.artistName.toLowerCase().includes(filters.artistName.toLowerCase());
+    });
 
     return {
         searchQuery,

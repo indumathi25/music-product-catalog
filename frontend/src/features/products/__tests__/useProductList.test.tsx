@@ -3,7 +3,9 @@ import { renderHook, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useProductList } from '../hooks/useProductList';
 import * as useProductsMock from '../hooks/useProducts';
-import { Product } from '../types';
+import { Product, ApiListResponse } from '../types';
+import { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 
 vi.mock('../hooks/useProducts', () => ({
     useProducts: vi.fn(),
@@ -13,7 +15,6 @@ vi.mock('../hooks/useProducts', () => ({
 vi.mock('react-redux', () => ({
     useSelector: vi.fn(),
 }));
-import { useSelector } from 'react-redux';
 
 const queryClient = new QueryClient();
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -26,7 +27,7 @@ describe('useProductList', () => {
         vi.mocked(useSelector).mockReturnValue('');
 
         vi.mocked(useProductsMock.useProducts).mockReturnValue({
-            data: { pages: [{ data: [], total: 0, page: 1, limit: 12 }], pageParams: [1] },
+            data: { pages: [{ data: [], total: 0 }], pageParams: [1] },
             fetchNextPage: vi.fn(),
             hasNextPage: false,
             isFetchingNextPage: false,
@@ -52,7 +53,7 @@ describe('useProductList', () => {
             isRefetching: false,
             isStale: false,
             refetch: vi.fn(),
-        } as any);
+        } as unknown as UseInfiniteQueryResult<InfiniteData<ApiListResponse<Product>>, Error>);
     });
 
     it('initializes with default filters', () => {
@@ -79,8 +80,8 @@ describe('useProductList', () => {
         ];
 
         vi.mocked(useProductsMock.useProducts).mockReturnValue({
-            data: { pages: [{ data: mockProducts, total: 2, page: 1, limit: 12 }], pageParams: [1] },
-        } as any);
+            data: { pages: [{ data: mockProducts, total: 2 }], pageParams: [1] },
+        } as unknown as UseInfiniteQueryResult<InfiniteData<ApiListResponse<Product>>, Error>);
 
         const { result } = renderHook(() => useProductList(), { wrapper });
 

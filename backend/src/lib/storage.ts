@@ -56,9 +56,10 @@ class LocalStorageService implements IStorageService {
 
             const filePath = path.join(this.uploadsDir, filename);
             await fs.unlink(filePath);
-        } catch (err: any) {
-            if (err.code !== 'ENOENT') {
-                logger.error({ err, url }, 'Failed to delete local file');
+        } catch (err: unknown) {
+            const error = err as { code?: string; message?: string };
+            if (error.code !== 'ENOENT') {
+                logger.error({ err: error, url }, 'Failed to delete local file');
             }
         }
     }

@@ -1,4 +1,4 @@
-# ── Development stage ──────────────────────────────────────────────────────────
+# ── Development stage 
 FROM node:22-alpine AS dev
 
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npx prisma generate
 EXPOSE 4000
 CMD ["npm", "run", "dev"]
 
-# ── Builder stage ──────────────────────────────────────────────────────────────
+# ── Builder stage 
 FROM node:22-alpine AS builder
 
 

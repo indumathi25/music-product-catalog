@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useProductDeletion } from '../hooks/useProductDeletion';
 import * as useDeleteProductMock from '../hooks/useDeleteProduct';
+import { Product } from '../types';
 
 vi.mock('../hooks/useDeleteProduct', () => ({
     useDeleteProduct: vi.fn(),
@@ -17,7 +18,21 @@ describe('useProductDeletion', () => {
         vi.mocked(useDeleteProductMock.useDeleteProduct).mockReturnValue({
             mutateAsync: mockMutateAsync,
             isPending: false,
-        } as any);
+            mutate: vi.fn(),
+            reset: vi.fn(),
+            data: undefined,
+            error: null,
+            isError: false,
+            isIdle: true,
+            isPaused: false,
+            isSuccess: false,
+            failureCount: 0,
+            failureReason: null,
+            status: 'idle',
+            submittedAt: 0,
+            variables: undefined,
+            context: undefined,
+        } as unknown as ReturnType<typeof useDeleteProductMock.useDeleteProduct>);
     });
 
     it('initializes with no selected product', () => {
@@ -27,7 +42,14 @@ describe('useProductDeletion', () => {
 
     it('sets selected product on request', () => {
         const { result } = renderHook(() => useProductDeletion());
-        const product = { id: VALID_UUID, title: 'Test', artistName: 'Artist' } as any;
+        const product: Product = {
+            id: VALID_UUID,
+            title: 'Test',
+            artistName: 'Artist',
+            coverArtUrl: '',
+            createdAt: '',
+            updatedAt: '',
+        };
 
         act(() => {
             result.current.handleDeleteRequest(product);
@@ -39,7 +61,14 @@ describe('useProductDeletion', () => {
     it('calls mutate async and clears selection on confirm', async () => {
         mockMutateAsync.mockResolvedValueOnce(undefined);
         const { result } = renderHook(() => useProductDeletion());
-        const product = { id: VALID_UUID, title: 'Test', artistName: 'Artist' } as any;
+        const product: Product = {
+            id: VALID_UUID,
+            title: 'Test',
+            artistName: 'Artist',
+            coverArtUrl: '',
+            createdAt: '',
+            updatedAt: '',
+        };
 
         act(() => {
             result.current.handleDeleteRequest(product);
@@ -55,7 +84,14 @@ describe('useProductDeletion', () => {
 
     it('clears selection on cancel', () => {
         const { result } = renderHook(() => useProductDeletion());
-        const product = { id: VALID_UUID, title: 'Test', artistName: 'Artist' } as any;
+        const product: Product = {
+            id: VALID_UUID,
+            title: 'Test',
+            artistName: 'Artist',
+            coverArtUrl: '',
+            createdAt: '',
+            updatedAt: '',
+        };
 
         act(() => {
             result.current.handleDeleteRequest(product);

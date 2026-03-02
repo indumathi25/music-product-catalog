@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect, type SubmitEvent } from 'react';
+import { useReducer, useEffect, type SubmitEvent } from 'react';
 import {
     productFormReducer,
     initialFormState,
@@ -22,7 +22,7 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         }
     }, [initialData]);
 
-    const handleFile = useCallback((file: File) => {
+    const handleFile = (file: File) => {
         if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
             dispatch({
                 type: 'SET_ERRORS',
@@ -38,7 +38,7 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         reader.onload = (e) =>
             dispatch({ type: 'SET_FILE', file, preview: e.target?.result as string });
         reader.readAsDataURL(file);
-    }, []);
+    };
 
     const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -59,13 +59,13 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         }
     };
 
-    const handleFieldChange = useCallback((field: 'title' | 'artistName', value: string) => {
+    const handleFieldChange = (field: 'title' | 'artistName', value: string) => {
         dispatch({ type: 'SET_FIELD', field, value });
-    }, []);
+    };
 
-    const handleClearFile = useCallback(() => {
+    const handleClearFile = () => {
         dispatch({ type: 'CLEAR_FILE' });
-    }, []);
+    };
 
     return {
         state,

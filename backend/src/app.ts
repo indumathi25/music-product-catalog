@@ -69,15 +69,16 @@ app.use('/uploads', express.static(path.resolve(env.UPLOADS_DIR), {
 }));
 
 // Load OpenAPI spec from YAML
-let swaggerSpec: any;
+let swaggerSpec: Record<string, unknown> | undefined;
 try {
     const yamlPath = path.resolve(__dirname, 'docs/openapi.yaml');
     const fileContent = fs.readFileSync(yamlPath, 'utf8');
-    swaggerSpec = yaml.load(fileContent);
+    const loaded = yaml.load(fileContent) as Record<string, unknown>;
 
-    if (swaggerSpec && swaggerSpec.servers) {
-        swaggerSpec.servers = [{ url: `http://localhost:${env.PORT}` }];
+    if (loaded && typeof loaded === 'object' && 'servers' in loaded) {
+        (loaded as { servers: unknown[] }).servers = [{ url: `http://localhost:${env.PORT}` }];
     }
+    swaggerSpec = loaded;
 } catch (err) {
     logger.error({ err }, 'Failed to load OpenAPI specification');
 }

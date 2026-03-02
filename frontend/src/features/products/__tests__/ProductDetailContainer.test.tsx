@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ProductDetailContainer } from '../containers/ProductDetailContainer';
 import * as useProductMock from '../hooks/useProduct';
 import * as useUpdateProductMock from '../hooks/useUpdateProduct';
+import { Product } from '../types';
 
 vi.mock('../hooks/useProduct', () => ({
     useProduct: vi.fn(),
@@ -18,7 +19,7 @@ const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 describe('ProductDetailContainer', () => {
     const mockUpdateMutateAsync = vi.fn();
 
-    const mockProduct = {
+    const mockProduct: Product = {
         id: VALID_UUID,
         title: 'Test Song',
         artistName: 'Test Artist',
@@ -33,12 +34,46 @@ describe('ProductDetailContainer', () => {
             data: mockProduct,
             isLoading: false,
             isError: false,
-        } as any);
+            isPending: false,
+            isSuccess: true,
+            isFetching: false,
+            error: null,
+            status: 'success',
+            fetchStatus: 'idle',
+            dataUpdatedAt: 0,
+            errorUpdatedAt: 0,
+            failureCount: 0,
+            failureReason: null,
+            errorUpdateCount: 0,
+            isFetched: true,
+            isFetchedAfterMount: true,
+            isInitialLoading: false,
+            isPaused: false,
+            isPlaceholderData: false,
+            isRefetchError: false,
+            isRefetching: false,
+            isStale: false,
+            refetch: vi.fn(),
+        } as unknown as ReturnType<typeof useProductMock.useProduct>);
 
         vi.mocked(useUpdateProductMock.useUpdateProduct).mockReturnValue({
             mutateAsync: mockUpdateMutateAsync,
             isPending: false,
-        } as any);
+            mutate: vi.fn(),
+            reset: vi.fn(),
+            data: undefined,
+            error: null,
+            isError: false,
+            isIdle: true,
+            isPaused: false,
+            isSuccess: false,
+            failureCount: 0,
+            failureReason: null,
+            status: 'idle',
+            submittedAt: 0,
+            variables: undefined,
+            context: undefined,
+        } as unknown as ReturnType<typeof useUpdateProductMock.useUpdateProduct>);
     });
 
     const renderComponent = () => {

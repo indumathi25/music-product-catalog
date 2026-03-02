@@ -5,6 +5,7 @@ import { ProductListContainer } from '../containers/ProductListContainer';
 import * as useProductListMock from '../hooks/useProductList';
 import * as useProductDeletionMock from '../hooks/useProductDeletion';
 import { MESSAGES } from '@/constants';
+import { Product } from '../types';
 
 const mockDispatch = vi.fn();
 vi.mock('react-redux', () => ({
@@ -29,7 +30,7 @@ describe('ProductListContainer', () => {
             handleDeleteRequest: vi.fn(),
             handleDeleteConfirm: vi.fn(),
             handleDeleteCancel: vi.fn(),
-        } as any);
+        } as unknown as ReturnType<typeof useProductDeletionMock.useProductDeletion>);
     });
 
     it('renders skeleton loader when loading initially', () => {
@@ -45,7 +46,8 @@ describe('ProductListContainer', () => {
             ref: vi.fn(),
             hasNextPage: true,
             isFetchingNextPage: false,
-        } as any);
+            inView: false,
+        } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
             <MemoryRouter>
@@ -70,7 +72,8 @@ describe('ProductListContainer', () => {
             ref: vi.fn(),
             hasNextPage: false,
             isFetchingNextPage: false,
-        } as any);
+            inView: false,
+        } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
             <MemoryRouter>
@@ -95,7 +98,8 @@ describe('ProductListContainer', () => {
             ref: vi.fn(),
             hasNextPage: false,
             isFetchingNextPage: false,
-        } as any);
+            inView: false,
+        } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
             <MemoryRouter>
@@ -119,7 +123,8 @@ describe('ProductListContainer', () => {
             ref: vi.fn(),
             hasNextPage: false,
             isFetchingNextPage: false,
-        } as any);
+            inView: false,
+        } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
             <MemoryRouter>
@@ -131,7 +136,7 @@ describe('ProductListContainer', () => {
     });
 
     it('renders product grid with products', () => {
-        const mockProducts = [
+        const mockProducts: Product[] = [
             { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', coverArtUrl: '', createdAt: '', updatedAt: '' },
             { id: 'uuid-2', title: 'Song 2', artistName: 'Artist 2', coverArtUrl: '', createdAt: '', updatedAt: '' },
         ];
@@ -148,7 +153,8 @@ describe('ProductListContainer', () => {
             ref: vi.fn(),
             hasNextPage: false,
             isFetchingNextPage: false,
-        } as any);
+            inView: false,
+        } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
             <MemoryRouter>
@@ -161,7 +167,7 @@ describe('ProductListContainer', () => {
     });
 
     it('renders delete modal when a product is selected for deletion', () => {
-        const mockProducts = [
+        const mockProducts: Product[] = [
             { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', coverArtUrl: '', createdAt: '', updatedAt: '' },
         ];
 
@@ -177,7 +183,8 @@ describe('ProductListContainer', () => {
             ref: vi.fn(),
             hasNextPage: false,
             isFetchingNextPage: false,
-        } as any);
+            inView: false,
+        } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         vi.mocked(useProductDeletionMock.useProductDeletion).mockReturnValue({
             selectedProduct: mockProducts[0], // Modal should be open
@@ -185,7 +192,7 @@ describe('ProductListContainer', () => {
             handleDeleteRequest: vi.fn(),
             handleDeleteConfirm: vi.fn(),
             handleDeleteCancel: vi.fn(),
-        } as any);
+        } as unknown as ReturnType<typeof useProductDeletionMock.useProductDeletion>);
 
         render(
             <MemoryRouter>

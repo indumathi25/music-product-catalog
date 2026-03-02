@@ -5,6 +5,7 @@ import { useUpdateProduct } from '../hooks/useUpdateProduct';
 import { productsApi } from '../api';
 import { PRODUCTS_QUERY_KEY } from '../hooks/useProducts';
 import { PRODUCT_QUERY_KEY } from '../hooks/useProduct';
+import { Product } from '../types';
 
 const mockDispatch = vi.fn();
 
@@ -38,8 +39,15 @@ describe('useUpdateProduct', () => {
     });
 
     it('updates a product and invalidates cache', async () => {
-        const mockProduct = { id: VALID_UUID, title: 'Updated Product' };
-        vi.mocked(productsApi.update).mockResolvedValue(mockProduct as any);
+        const mockProduct: Product = {
+            id: VALID_UUID,
+            title: 'Updated Product',
+            artistName: 'Artist',
+            coverArtUrl: 'http://example.com/art.jpg',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        vi.mocked(productsApi.update).mockResolvedValue(mockProduct);
 
         const { result } = renderHook(() => useUpdateProduct(), { wrapper });
 

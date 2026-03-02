@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useProducts } from '../hooks/useProducts';
 import { productsApi } from '../api';
+import { Product, ApiListResponse } from '../types';
 
 vi.mock('../api', () => ({
     productsApi: {
@@ -33,9 +34,7 @@ describe('useProducts', () => {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             }],
-            total: 1,
-            page: 1,
-            limit: 12
+            total: 1
         };
         vi.mocked(productsApi.getAll).mockResolvedValue(mockData);
 
@@ -48,13 +47,11 @@ describe('useProducts', () => {
     });
 
     it('passes search params to the API', async () => {
-        const mockData = {
-            data: [] as any[],
-            total: 0,
-            page: 1,
-            limit: 12
+        const mockData: ApiListResponse<Product> = {
+            data: [],
+            total: 0
         };
-        vi.mocked(productsApi.getAll).mockResolvedValue(mockData as any);
+        vi.mocked(productsApi.getAll).mockResolvedValue(mockData);
 
         const { result } = renderHook(() => useProducts({ search: 'query' }), { wrapper });
 

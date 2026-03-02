@@ -16,7 +16,21 @@ describe('CreateProductContainer', () => {
         vi.mocked(useCreateProductMock.useCreateProduct).mockReturnValue({
             mutateAsync: mockMutateAsync,
             isPending: false,
-        } as any);
+            mutate: vi.fn(),
+            reset: vi.fn(),
+            data: undefined,
+            error: null,
+            isError: false,
+            isIdle: true,
+            isPaused: false,
+            isSuccess: false,
+            failureCount: 0,
+            failureReason: null,
+            status: 'idle',
+            submittedAt: 0,
+            variables: undefined,
+            context: undefined,
+        } as unknown as ReturnType<typeof useCreateProductMock.useCreateProduct>);
     });
 
     it('renders the create product form', () => {
@@ -68,7 +82,21 @@ describe('CreateProductContainer', () => {
         vi.mocked(useCreateProductMock.useCreateProduct).mockReturnValue({
             mutateAsync: mockMutateAsync,
             isPending: true,
-        } as any);
+            mutate: vi.fn(),
+            reset: vi.fn(),
+            data: undefined,
+            error: null,
+            isError: false,
+            isIdle: false,
+            isPaused: false,
+            isSuccess: false,
+            failureCount: 0,
+            failureReason: null,
+            status: 'pending',
+            submittedAt: Date.now(),
+            variables: undefined,
+            context: undefined,
+        } as unknown as ReturnType<typeof useCreateProductMock.useCreateProduct>);
 
         render(
             <MemoryRouter>

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { productsApi } from '../api';
 import { PRODUCTS_QUERY_KEY } from '../hooks/useProducts';
+import { Product } from '../types';
 
 const mockDispatch = vi.fn();
 
@@ -36,8 +37,15 @@ describe('useCreateProduct', () => {
     });
 
     it('creates a product and invalidates cache', async () => {
-        const mockProduct = { id: VALID_UUID, title: 'New Product' };
-        vi.mocked(productsApi.create).mockResolvedValue(mockProduct as any);
+        const mockProduct: Product = {
+            id: VALID_UUID,
+            title: 'New Product',
+            artistName: 'Artist',
+            coverArtUrl: 'http://example.com/art.jpg',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        vi.mocked(productsApi.create).mockResolvedValue(mockProduct);
 
         const { result } = renderHook(() => useCreateProduct(), { wrapper });
 
