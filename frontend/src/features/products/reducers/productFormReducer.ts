@@ -51,7 +51,7 @@ export function productFormReducer(
                 ...state,
                 title: action.product.title,
                 artistName: action.product.artistName,
-                preview: action.product.coverArtUrl,
+                preview: action.product.images[0]?.url ?? null,
             };
         case 'RESET':
             return initialFormState;

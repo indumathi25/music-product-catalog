@@ -30,7 +30,7 @@ describe('useProducts', () => {
                 id: VALID_UUID,
                 title: 'Test Product',
                 artistName: 'Test Artist',
-                coverArtUrl: '',
+                images: [],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             }],

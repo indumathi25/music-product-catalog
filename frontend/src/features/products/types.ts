@@ -1,8 +1,18 @@
+export interface Image {
+    id: string;
+    url: string;
+    altText: string | null;
+    mimeType: string | null;
+    sizeBytes: number | null;
+    width: number | null;
+    height: number | null;
+}
+
 export interface Product {
     id: string;
     title: string;
     artistName: string;
-    coverArtUrl: string;
+    images: Image[];
     createdAt: string;
     updatedAt: string;
 }

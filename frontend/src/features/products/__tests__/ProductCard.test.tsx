@@ -8,7 +8,17 @@ const mockProduct: Product = {
     id: '550e8400-e29b-41d4-a716-446655440000',
     title: 'Abbey Road',
     artistName: 'The Beatles',
-    coverArtUrl: 'http://localhost:4000/uploads/cover-test.jpg',
+    images: [
+        {
+            id: 'img-1',
+            url: 'http://localhost:4000/uploads/cover-test.jpg',
+            altText: 'Cover art for Abbey Road by The Beatles',
+            mimeType: 'image/webp',
+            sizeBytes: 12345,
+            width: 400,
+            height: 400,
+        },
+    ],
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
 };

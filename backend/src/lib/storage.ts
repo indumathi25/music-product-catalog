@@ -6,8 +6,16 @@ import { env } from '../config/env';
 import { logger } from './logger';
 import { StorageConstants } from '../constants';
 
+export interface ImageMetadata {
+    url: string;
+    width: number;
+    height: number;
+    sizeBytes: number;
+    mimeType: string;
+}
+
 export interface IStorageService {
-    uploadFile(file: Express.Multer.File): Promise<string>;
+    uploadFile(file: Express.Multer.File): Promise<ImageMetadata>;
     deleteFile(url: string): Promise<void>;
 }
 
@@ -39,14 +47,22 @@ async function optimizeImage(buffer: Buffer): Promise<Buffer> {
 class LocalStorageService implements IStorageService {
     private readonly uploadsDir = path.resolve(env.UPLOADS_DIR);
 
-    async uploadFile(file: Express.Multer.File): Promise<string> {
+    async uploadFile(file: Express.Multer.File): Promise<ImageMetadata> {
         const optimizedBuffer = await optimizeImage(file.buffer);
+        const metadata = await sharp(optimizedBuffer).metadata();
         const filename = `cover-${Date.now()}-${Math.floor(Math.random() * 1e9)}.webp`;
         const filePath = path.join(this.uploadsDir, filename);
 
         await fs.writeFile(filePath, optimizedBuffer);
         logger.info({ filePath, filename }, 'Local file uploaded successfully');
-        return `${StorageConstants.LOCAL_UPLOADS_PATH}${filename}`;
+
+        return {
+            url: `${StorageConstants.LOCAL_UPLOADS_PATH}${filename}`,
+            width: metadata.width ?? 0,
+            height: metadata.height ?? 0,
+            sizeBytes: metadata.size ?? optimizedBuffer.length,
+            mimeType: 'image/webp'
+        };
     }
 
     async deleteFile(url: string): Promise<void> {
@@ -92,8 +108,9 @@ class S3StorageService implements IStorageService {
         }
     }
 
-    async uploadFile(file: Express.Multer.File): Promise<string> {
+    async uploadFile(file: Express.Multer.File): Promise<ImageMetadata> {
         const optimizedBuffer = await optimizeImage(file.buffer);
+        const metadata = await sharp(optimizedBuffer).metadata();
         const key = `${StorageConstants.S3_COVERS_PREFIX}cover-${Date.now()}-${Math.floor(Math.random() * 1e9)}.webp`;
 
         await this.client.send(new PutObjectCommand({
@@ -104,7 +121,13 @@ class S3StorageService implements IStorageService {
             CacheControl: 'public, max-age=31536000, immutable',
         }));
 
-        return `https://${this.bucket}.s3.${env.S3_REGION}.amazonaws.com/${key}`;
+        return {
+            url: `https://${this.bucket}.s3.${env.S3_REGION}.amazonaws.com/${key}`,
+            width: metadata.width ?? 0,
+            height: metadata.height ?? 0,
+            sizeBytes: metadata.size ?? optimizedBuffer.length,
+            mimeType: 'image/webp'
+        };
     }
 
     async deleteFile(url: string): Promise<void> {

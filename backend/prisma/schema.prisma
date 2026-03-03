@@ -14,6 +14,7 @@ model Artist {
   id         String    @id @default(uuid())
   name       String    @unique
   products   Product[]
+  images     Image[]   // New direct relation
   created_at DateTime  @default(now())
 
   @@map("artists")
@@ -24,7 +25,7 @@ model Product {
   artist_id      String
   artist         Artist   @relation(fields: [artist_id], references: [id], onDelete: Cascade)
   title          String
-  cover_art_url  String
+  images         Image[]
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
@@ -32,4 +33,23 @@ model Product {
   @@index([title])
   @@index([created_at])
   @@map("products")
+}
+
+model Image {
+  id         String   @id @default(uuid())
+  product_id String?  // Optional now
+  product    Product? @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  artist_id  String?  // New field
+  artist     Artist?  @relation(fields: [artist_id], references: [id], onDelete: SetNull)
+  url        String
+  alt_text   String?
+  mime_type  String?
+  size_bytes Int?
+  width      Int?
+  height     Int?
+  created_at DateTime @default(now())
+
+  @@index([product_id])
+  @@index([artist_id])
+  @@map("images")
 }

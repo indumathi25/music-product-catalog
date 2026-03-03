@@ -16,14 +16,33 @@ export function ProductDetailView({ product, onEdit, onBack }: ProductDetailView
             <div className="w-full md:w-1/2 lg:w-2/5">
                 <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100 shadow-lg ring-1 ring-gray-200">
                     <img
-                        src={product.coverArtUrl}
-                        alt={product.title}
+                        src={product.images[0]?.url}
+                        alt={product.images[0]?.altText || product.title}
                         className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                         fetchPriority="high"
-                        width={600}
-                        height={600}
+                        width={product.images[0]?.width || 600}
+                        height={product.images[0]?.height || 600}
                     />
                 </div>
+                {product.images[0] && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {product.images[0].width && product.images[0].height && (
+                            <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                {product.images[0].width} × {product.images[0].height} px
+                            </span>
+                        )}
+                        {product.images[0].sizeBytes && (
+                            <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                {(product.images[0].sizeBytes / 1024).toFixed(1)} KB
+                            </span>
+                        )}
+                        {product.images[0].mimeType && (
+                            <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                {product.images[0].mimeType.split('/')[1].toUpperCase()}
+                            </span>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Info Section */}

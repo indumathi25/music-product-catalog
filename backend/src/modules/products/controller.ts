@@ -18,7 +18,10 @@ export const productController = {
             // Add Link header for LCP preload of the first product image
             if (result.data.length > 0) {
                 const firstProduct = result.data[0];
-                res.setHeader('Link', `<${firstProduct.coverArtUrl}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
+                const mainImage = firstProduct.images[0];
+                if (mainImage) {
+                    res.setHeader('Link', `<${mainImage.url}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
+                }
             }
 
             res.json(result);
@@ -33,7 +36,10 @@ export const productController = {
             const product = await productService.getById(id);
 
             // Preload the main image for the detail view
-            res.setHeader('Link', `<${product.coverArtUrl}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
+            const mainImage = product.images[0];
+            if (mainImage) {
+                res.setHeader('Link', `<${mainImage.url}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
+            }
 
             res.json({ data: product });
         } catch (err) {
@@ -47,11 +53,11 @@ export const productController = {
                 throw new AppError(400, 'MISSING_COVER_ART', 'Cover art image is required');
             }
             const body = req.body as CreateProductInput;
-            const coverUrl = await storageService.uploadFile(req.file);
+            const imageMetadata = await storageService.uploadFile(req.file);
             const product = await productService.create({
                 title: body.title,
                 artistName: body.artistName,
-                coverArtUrl: coverUrl,
+                image: imageMetadata,
             });
             res.status(201).json({ data: product });
         } catch (err) {
@@ -63,11 +69,11 @@ export const productController = {
         try {
             const { id } = req.params as unknown as ProductIdParam;
             const body = req.body as UpdateProductInput;
-            const coverArtUrl = req.file ? await storageService.uploadFile(req.file) : undefined;
+            const imageMetadata = req.file ? await storageService.uploadFile(req.file) : undefined;
             const product = await productService.update(id, {
                 title: body.title,
                 artistName: body.artistName,
-                coverArtUrl,
+                image: imageMetadata,
             });
             res.json({ data: product });
         } catch (err) {

@@ -10,9 +10,28 @@ const mockProduct = {
     id: 'uuid-1',
     title: 'Abbey Road',
     artist: { name: 'The Beatles' },
-    cover_art_url: 'http://localhost:4000/uploads/cover-test.jpg',
+    images: [
+        {
+            id: 'img-1',
+            url: 'http://localhost:4000/uploads/cover-test.jpg',
+            alt_text: 'Cover art',
+            mime_type: 'image/webp',
+            size_bytes: 1000,
+            width: 600,
+            height: 600,
+            created_at: new Date('2024-01-01'),
+        }
+    ],
     created_at: new Date('2024-01-01'),
     updated_at: new Date('2024-01-01'),
+};
+
+const mockImageMetadata = {
+    url: 'http://localhost:4000/uploads/cover-test.jpg',
+    width: 600,
+    height: 600,
+    sizeBytes: 1000,
+    mimeType: 'image/webp',
 };
 
 describe('productService', () => {
@@ -33,7 +52,9 @@ describe('productService', () => {
                 id: mockProduct.id,
                 title: mockProduct.title,
                 artistName: mockProduct.artist.name,
-                coverArtUrl: mockProduct.cover_art_url,
+                images: expect.arrayContaining([
+                    expect.objectContaining({ url: mockProduct.images[0].url })
+                ]),
             });
         });
     });
@@ -62,7 +83,7 @@ describe('productService', () => {
             const result = await productService.create({
                 title: 'Abbey Road',
                 artistName: 'The Beatles',
-                coverArtUrl: 'http://localhost:4000/uploads/cover-test.jpg',
+                image: mockImageMetadata,
             });
             expect(mockRepo.create).toHaveBeenCalledTimes(1);
             expect(result.title).toBe('Abbey Road');

@@ -20,13 +20,13 @@ export function ProductCard({ product, onDelete, priority = false }: ProductCard
                 {/* Cover Art */}
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                     <img
-                        src={product.coverArtUrl}
-                        alt={`Cover art for ${product.title} by ${product.artistName}`}
+                        src={product.images[0]?.url}
+                        alt={product.images[0]?.altText || `Cover art for ${product.title} by ${product.artistName}`}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading={priority ? 'eager' : 'lazy'}
                         {...(priority ? { fetchPriority: 'high' } : {})}
-                        width={400}
-                        height={400}
+                        width={product.images[0]?.width || 400}
+                        height={product.images[0]?.height || 400}
                         onError={(e) => {
                             (e.currentTarget as HTMLImageElement).src =
                                 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="55" font-size="30" text-anchor="middle" fill="%23d1d5db"%3E🎵%3C/text%3E%3C/svg%3E';

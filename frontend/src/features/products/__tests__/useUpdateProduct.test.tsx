@@ -50,7 +50,17 @@ describe('useUpdateProduct', () => {
             id: VALID_UUID,
             title: 'Updated Product',
             artistName: 'Artist',
-            coverArtUrl: 'http://example.com/art.jpg',
+            images: [
+                {
+                    id: 'img-1',
+                    url: 'http://example.com/art.jpg',
+                    altText: 'Alt text',
+                    mimeType: 'image/jpeg',
+                    sizeBytes: 1000,
+                    width: 500,
+                    height: 500,
+                },
+            ],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };

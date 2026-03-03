@@ -31,7 +31,17 @@ describe('ProductDetailContainer', () => {
         id: VALID_UUID,
         title: 'Test Song',
         artistName: 'Test Artist',
-        coverArtUrl: 'http://localhost/cover.jpg',
+        images: [
+            {
+                id: 'img-1',
+                url: 'http://localhost/cover.jpg',
+                altText: 'Cover art',
+                mimeType: 'image/webp',
+                sizeBytes: 1000,
+                width: 600,
+                height: 600,
+            },
+        ],
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
     };

@@ -43,13 +43,16 @@ export const productService = {
 
         const updated = await productRepository.update(id, data);
 
-        // Remove old image only AFTER successful DB update
-        if (data.coverArtUrl && existing.cover_art_url !== data.coverArtUrl) {
-            try {
-                await storageService.deleteFile(existing.cover_art_url);
-            } catch (err) {
-                // Log but don't fail the request since DB update was successful
-                console.error(`Failed to delete old file ${existing.cover_art_url}:`, err);
+        // Remove old images only AFTER successful DB update
+        if (data.image && existing.images && existing.images.length > 0) {
+            for (const oldImg of existing.images) {
+                if (oldImg.url !== data.image.url) {
+                    try {
+                        await storageService.deleteFile(oldImg.url);
+                    } catch (err) {
+                        console.error(`Failed to delete old file ${oldImg.url}:`, err);
+                    }
+                }
             }
         }
 
@@ -66,10 +69,14 @@ export const productService = {
         await productRepository.delete(id);
 
         // 2. Cleanup storage second
-        try {
-            await storageService.deleteFile(existing.cover_art_url);
-        } catch (err) {
-            console.error(`Failed to cleanup file ${existing.cover_art_url} after product deletion:`, err);
+        if (existing.images) {
+            for (const img of existing.images) {
+                try {
+                    await storageService.deleteFile(img.url);
+                } catch (err) {
+                    console.error(`Failed to cleanup file ${img.url} after product deletion:`, err);
+                }
+            }
         }
     },
 };

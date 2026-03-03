@@ -43,7 +43,7 @@ The application is highly optimized for performance, accessibility, and SEO.
 |-------------|---------------|----------------|-----|
 | **97**      | **96**        | **96**         | **92** |
  
-![Lighthouse Results](/Users/indumathivelan/Desktop/FUGA/docs/lighthouse-results.png)
+![Lighthouse Results](./docs/lighthouse-results.png)
 
 ---
 
@@ -187,3 +187,12 @@ Fully automated CI pipeline on every push:
 - **Unit & Integration Testing**
 - **Production Build Validation**
 - **Docker Image Build Verification**
+
+---
+
+## Future Enhancements & Architectural Trade-offs
+
+### 1. Direct S3 Uploads via Pre-signed URLs for Large Files
+Currently, the frontend restricts image uploads to 5MB, and the Node.js backend processes these images using `sharp` (resizing and WebP conversion) before pushing to S3. 
+- **Enhancement**: To support massive high-resolution imagery without crashing the Node.js server (Out-Of-Memory errors), the backend can generate a **Pre-signed S3 PUT URL**. The frontend will use this URL to stream the raw file directly to the S3 bucket.
+- **Trade-off**: By bypassing the backend, the `sharp` optimization step is lost. To maintain the high-performance UX of the `ProductGrid`, an **AWS Lambda function** (triggered by an S3 put event) would need to be introduced to asynchronously optimize the newly uploaded images before updating the catalog.

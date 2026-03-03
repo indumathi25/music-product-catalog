@@ -77,24 +77,36 @@ async function main() {
             const buffer = Buffer.from(arrayBuffer);
 
             // 2. Upload to S3 (Mocking Multer file object)
-            const s3Url = await storageService.uploadFile({
+            const imageMetadata = await storageService.uploadFile({
                 buffer,
                 mimetype: 'image/jpeg',
                 originalname: `${p.name.replace(/\s+/g, '-').toLowerCase()}.webp`,
                 size: buffer.byteLength,
             } as any);
 
-            // 3. Create DB record with Join
+            // 3. Find or Create Artist
+            const artist = await prisma.artist.upsert({
+                where: { name: p.artist },
+                update: {},
+                create: { name: p.artist },
+            });
+
+            // 4. Create DB record with Join
             await prisma.product.create({
                 data: {
                     title: p.name,
-                    cover_art_url: s3Url,
-                    artist: {
-                        connectOrCreate: {
-                            where: { name: p.artist },
-                            create: { name: p.artist },
-                        },
-                    },
+                    artist: { connect: { id: artist.id } },
+                    images: {
+                        create: {
+                            url: imageMetadata.url,
+                            width: imageMetadata.width,
+                            height: imageMetadata.height,
+                            size_bytes: imageMetadata.sizeBytes,
+                            mime_type: imageMetadata.mimeType,
+                            alt_text: `Cover art for ${p.name} by ${p.artist}`,
+                            artist: { connect: { id: artist.id } },
+                        }
+                    }
                 },
             });
         } catch (error) {

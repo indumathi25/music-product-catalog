@@ -115,7 +115,7 @@ describe('ProductListContainer', () => {
             searchQuery: 'Test',
             filters: { artistName: '', limit: 12 },
             setFilters: vi.fn(),
-            allProducts: [{ id: 'uuid-1', title: 'A', artistName: 'A', coverArtUrl: '', createdAt: '', updatedAt: '' }],
+            allProducts: [{ id: 'uuid-1', title: 'A', artistName: 'A', images: [], createdAt: '', updatedAt: '' }],
             filteredProducts: [], // Filtered out
             isLoading: false,
             isError: false,
@@ -137,8 +137,8 @@ describe('ProductListContainer', () => {
 
     it('renders product grid with products', () => {
         const mockProducts: Product[] = [
-            { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', coverArtUrl: '', createdAt: '', updatedAt: '' },
-            { id: 'uuid-2', title: 'Song 2', artistName: 'Artist 2', coverArtUrl: '', createdAt: '', updatedAt: '' },
+            { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', images: [], createdAt: '', updatedAt: '' },
+            { id: 'uuid-2', title: 'Song 2', artistName: 'Artist 2', images: [], createdAt: '', updatedAt: '' },
         ];
 
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
@@ -168,7 +168,7 @@ describe('ProductListContainer', () => {
 
     it('renders delete modal when a product is selected for deletion', () => {
         const mockProducts: Product[] = [
-            { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', coverArtUrl: '', createdAt: '', updatedAt: '' },
+            { id: 'uuid-1', title: 'Song 1', artistName: 'Artist 1', images: [], createdAt: '', updatedAt: '' },
         ];
 
         vi.mocked(useProductListMock.useProductList).mockReturnValue({

@@ -46,7 +46,7 @@ describe('useProductDeletion', () => {
             id: VALID_UUID,
             title: 'Test',
             artistName: 'Artist',
-            coverArtUrl: '',
+            images: [],
             createdAt: '',
             updatedAt: '',
         };
@@ -65,7 +65,7 @@ describe('useProductDeletion', () => {
             id: VALID_UUID,
             title: 'Test',
             artistName: 'Artist',
-            coverArtUrl: '',
+            images: [],
             createdAt: '',
             updatedAt: '',
         };
@@ -88,7 +88,7 @@ describe('useProductDeletion', () => {
             id: VALID_UUID,
             title: 'Test',
             artistName: 'Artist',
-            coverArtUrl: '',
+            images: [],
             createdAt: '',
             updatedAt: '',
         };
