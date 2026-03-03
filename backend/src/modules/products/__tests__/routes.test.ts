@@ -4,14 +4,16 @@ import { productService } from '../service';
 
 jest.mock('../service');
 
+import { Request, Response, NextFunction } from 'express';
+
 jest.mock('express-oauth2-jwt-bearer', () => ({
-    auth: jest.fn(() => (req: any, _res: any, next: any) => {
+    auth: jest.fn(() => (req: Request, _res: Response, next: NextFunction) => {
         if (req.headers.authorization) {
             return next();
         }
-        const error = new Error('UnauthorizedError') as any;
+        const error = new Error('UnauthorizedError');
         error.name = 'UnauthorizedError';
-        error.status = 401;
+        (error as Error & { status: number }).status = 401;
         return next(error);
     }),
 }));
