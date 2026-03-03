@@ -75,8 +75,8 @@ describe('useProductList', () => {
 
     it('filters products client-side by artist name', () => {
         const mockProducts: Product[] = [
-            { id: 'uuid-1', title: 'A', artistName: 'The Beatles', coverArtUrl: '', createdAt: '', updatedAt: '' },
-            { id: 'uuid-2', title: 'B', artistName: 'Rolling Stones', coverArtUrl: '', createdAt: '', updatedAt: '' },
+            { id: 'uuid-1', title: 'A', artistName: 'The Beatles', images: [], createdAt: '', updatedAt: '' },
+            { id: 'uuid-2', title: 'B', artistName: 'Rolling Stones', images: [], createdAt: '', updatedAt: '' },
         ];
 
         vi.mocked(useProductsMock.useProducts).mockReturnValue({
