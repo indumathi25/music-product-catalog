@@ -29,7 +29,7 @@ export const errorHandler = (
         return;
     }
 
-    if (err instanceof Error && err.name === 'UnauthorizedError') {
+    if (err && (err as any).name === 'UnauthorizedError') {
         res.status(401).json({
             error: {
                 code: 'UNAUTHORIZED',
