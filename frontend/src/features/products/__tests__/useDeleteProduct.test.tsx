@@ -18,6 +18,13 @@ vi.mock('react-redux', () => ({
     useDispatch: () => mockDispatch,
 }));
 
+vi.mock('@auth0/auth0-react', () => ({
+    useAuth0: () => ({
+        isAuthenticated: true,
+        getAccessTokenSilently: vi.fn().mockResolvedValue('mock-token'),
+    }),
+}));
+
 const queryClient = new QueryClient({
     defaultOptions: {
         mutations: { retry: false },
@@ -45,7 +52,7 @@ describe('useDeleteProduct', () => {
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(productsApi.delete).toHaveBeenCalledWith(VALID_UUID);
+        expect(productsApi.delete).toHaveBeenCalledWith(VALID_UUID, 'mock-token');
         expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: PRODUCTS_QUERY_KEY });
         expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: [...PRODUCT_QUERY_KEY, VALID_UUID] });
         expect(mockDispatch).toHaveBeenCalledWith(

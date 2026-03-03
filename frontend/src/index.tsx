@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@ta
 import { Toaster, toast } from 'react-hot-toast';
 import { store, persistor } from './store';
 import { App } from './app/App';
+import { AuthProvider } from './components/AuthProvider';
 import './styles/index.css';
 
 const queryClient = new QueryClient({
@@ -38,9 +39,11 @@ root.render(
         <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
                 <QueryClientProvider client={queryClient}>
-                    <Toaster position="top-right" />
                     <BrowserRouter>
-                        <App />
+                        <AuthProvider>
+                            <Toaster position="top-right" />
+                            <App />
+                        </AuthProvider>
                     </BrowserRouter>
                 </QueryClientProvider>
             </PersistGate>

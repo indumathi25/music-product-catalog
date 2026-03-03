@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth0 } from '@auth0/auth0-react';
 import { productsApi } from '../api';
 import { UpdateProductDto } from '../types';
 import { PRODUCTS_QUERY_KEY } from './useProducts';
@@ -9,10 +10,13 @@ import { UI_CONSTANTS, QUERY_KEYS } from '../../../constants';
 export function useUpdateProduct() {
     const queryClient = useQueryClient();
     const dispatch = useDispatch();
+    const { getAccessTokenSilently } = useAuth0();
 
     return useMutation({
-        mutationFn: ({ id, dto }: { id: string; dto: UpdateProductDto }) =>
-            productsApi.update(id, dto),
+        mutationFn: async ({ id, dto }: { id: string; dto: UpdateProductDto }) => {
+            const token = await getAccessTokenSilently();
+            return productsApi.update(id, dto, token);
+        },
         onSuccess: (updatedProduct, { id }) => {
             queryClient.setQueryData(QUERY_KEYS.PRODUCT(id), updatedProduct);
             queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });

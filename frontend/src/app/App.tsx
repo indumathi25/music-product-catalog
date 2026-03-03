@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { NotFound } from '@/components/NotFound';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 // Lazy routes
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -55,9 +56,16 @@ export function App() {
             <ErrorBoundary>
                 <Suspense fallback={<PageLoader />}>
                     <Routes>
+                        {/* Public routes */}
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/create" element={<CreateProductPage />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
+
+                        {/* Protected routes — redirect to Auth0 login if not authenticated */}
+                        <Route
+                            path="/create"
+                            element={<ProtectedRoute component={CreateProductPage} />}
+                        />
+
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </Suspense>

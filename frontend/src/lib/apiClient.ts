@@ -16,6 +16,7 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 type RequestOptions = Omit<RequestInit, 'body' | 'method'> & {
     body?: FormData | Record<string, unknown>;
     signal?: AbortSignal;
+    accessToken?: string;
 };
 
 async function safeJson<T>(response: Response): Promise<T | null> {
@@ -31,13 +32,17 @@ async function request<T>(
     method: HttpMethod = 'GET',
     options: RequestOptions = {},
 ): Promise<T> {
-    const { body, headers, ...rest } = options;
+    const { body, headers, accessToken, ...rest } = options;
+
+    const authHeaders: Record<string, string> = accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
+        : {};
 
     const init: RequestInit = {
         method,
         ...rest,
         headers: {
-            'X-API-KEY': 'fuga_secret_key_2026', // Standard dummy key
+            ...authHeaders,
             ...(body instanceof FormData
                 ? headers
                 : {
@@ -83,6 +88,7 @@ async function request<T>(
     const data = await safeJson<T>(response);
     return data as T;
 }
+
 export const apiClient = {
     get<T>(path: string, params?: Record<string, unknown>, signal?: AbortSignal): Promise<T> {
         let fullPath = path;
@@ -101,15 +107,15 @@ export const apiClient = {
         return request<T>(fullPath, 'GET', { signal });
     },
 
-    post<T>(path: string, body: FormData | Record<string, unknown>, signal?: AbortSignal): Promise<T> {
-        return request<T>(path, 'POST', { body, signal });
+    post<T>(path: string, body: FormData | Record<string, unknown>, accessToken?: string, signal?: AbortSignal): Promise<T> {
+        return request<T>(path, 'POST', { body, accessToken, signal });
     },
 
-    put<T>(path: string, body: FormData | Record<string, unknown>, signal?: AbortSignal): Promise<T> {
-        return request<T>(path, 'PUT', { body, signal });
+    put<T>(path: string, body: FormData | Record<string, unknown>, accessToken?: string, signal?: AbortSignal): Promise<T> {
+        return request<T>(path, 'PUT', { body, accessToken, signal });
     },
 
-    delete(path: string, signal?: AbortSignal): Promise<void> {
-        return request<void>(path, 'DELETE', { signal });
+    delete(path: string, accessToken?: string, signal?: AbortSignal): Promise<void> {
+        return request<void>(path, 'DELETE', { accessToken, signal });
     },
 };

@@ -1,3 +1,4 @@
+import { useAuth0 } from '@auth0/auth0-react';
 import { Product } from '../types';
 
 interface ProductDetailViewProps {
@@ -7,6 +8,8 @@ interface ProductDetailViewProps {
 }
 
 export function ProductDetailView({ product, onEdit, onBack }: ProductDetailViewProps) {
+    const { isAuthenticated } = useAuth0();
+
     return (
         <div className="flex flex-col gap-8 md:flex-row md:items-start lg:gap-12">
             {/* Cover Art Section */}
@@ -64,17 +67,19 @@ export function ProductDetailView({ product, onEdit, onBack }: ProductDetailView
                     </dl>
                 </div>
 
-                <div className="mt-8 flex gap-4">
-                    <button
-                        onClick={onEdit}
-                        className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 transition-all active:scale-95"
-                    >
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        Edit Details
-                    </button>
-                </div>
+                {isAuthenticated && (
+                    <div className="mt-8 flex gap-4">
+                        <button
+                            onClick={onEdit}
+                            className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 transition-all active:scale-95"
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Edit Details
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

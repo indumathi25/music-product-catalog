@@ -19,6 +19,13 @@ vi.mock('react-redux', () => ({
     useDispatch: () => mockDispatch,
 }));
 
+vi.mock('@auth0/auth0-react', () => ({
+    useAuth0: () => ({
+        isAuthenticated: true,
+        getAccessTokenSilently: vi.fn().mockResolvedValue('mock-token'),
+    }),
+}));
+
 const queryClient = new QueryClient({
     defaultOptions: {
         mutations: { retry: false },
@@ -57,7 +64,7 @@ describe('useUpdateProduct', () => {
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(productsApi.update).toHaveBeenCalledWith(VALID_UUID, dto);
+        expect(productsApi.update).toHaveBeenCalledWith(VALID_UUID, dto, 'mock-token');
         expect(queryClient.setQueryData).toHaveBeenCalledWith([...PRODUCT_QUERY_KEY, VALID_UUID], mockProduct);
         expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: PRODUCTS_QUERY_KEY });
         expect(mockDispatch).toHaveBeenCalledWith(

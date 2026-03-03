@@ -19,16 +19,16 @@ export const productsApi = {
         return response.data;
     },
 
-    create: async (dto: CreateProductDto): Promise<Product> => {
+    create: async (dto: CreateProductDto, accessToken?: string): Promise<Product> => {
         const form = new FormData();
         form.append('title', dto.title);
         form.append('artistName', dto.artistName);
         form.append('coverArt', dto.coverArt);
-        const response = await apiClient.post<ApiSingleResponse<Product>>(API_PATHS.PRODUCTS.BASE, form);
+        const response = await apiClient.post<ApiSingleResponse<Product>>(API_PATHS.PRODUCTS.BASE, form, accessToken);
         return response.data;
     },
 
-    update: async (id: string, dto: UpdateProductDto): Promise<Product> => {
+    update: async (id: string, dto: UpdateProductDto, accessToken?: string): Promise<Product> => {
         const form = new FormData();
         if (dto.title) form.append('title', dto.title);
         if (dto.artistName) form.append('artistName', dto.artistName);
@@ -36,11 +36,12 @@ export const productsApi = {
         const response = await apiClient.put<ApiSingleResponse<Product>>(
             API_PATHS.PRODUCTS.BY_ID(id),
             form,
+            accessToken,
         );
         return response.data;
     },
 
-    delete: async (id: string): Promise<void> => {
-        await apiClient.delete(API_PATHS.PRODUCTS.BY_ID(id));
+    delete: async (id: string, accessToken?: string): Promise<void> => {
+        await apiClient.delete(API_PATHS.PRODUCTS.BY_ID(id), accessToken);
     },
 };

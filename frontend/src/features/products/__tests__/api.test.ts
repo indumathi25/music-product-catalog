@@ -48,7 +48,8 @@ describe('productsApi', () => {
 
         expect(apiClient.post).toHaveBeenCalledWith(
             '/api/products',
-            expect.any(FormData)
+            expect.any(FormData),
+            undefined
         );
     });
 
@@ -61,7 +62,8 @@ describe('productsApi', () => {
 
         expect(apiClient.put).toHaveBeenCalledWith(
             `/api/products/${VALID_UUID}`,
-            expect.any(FormData)
+            expect.any(FormData),
+            undefined
         );
     });
 
@@ -70,6 +72,6 @@ describe('productsApi', () => {
 
         await productsApi.delete(VALID_UUID);
 
-        expect(apiClient.delete).toHaveBeenCalledWith(`/api/products/${VALID_UUID}`);
+        expect(apiClient.delete).toHaveBeenCalledWith(`/api/products/${VALID_UUID}`, undefined);
     });
 });

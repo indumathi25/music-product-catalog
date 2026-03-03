@@ -12,6 +12,8 @@ const envSchema = z.object({
     S3_REGION: z.string().optional(),
     AWS_ACCESS_KEY_ID: z.string().optional(),
     AWS_SECRET_ACCESS_KEY: z.string().optional(),
+    AUTH0_ISSUER_BASE_URL: z.string().default('https://placeholder.auth0.com'),
+    AUTH0_AUDIENCE: z.string().default('https://api.fuga.music'),
 });
 
 const parsed = envSchema.safeParse(process.env);
