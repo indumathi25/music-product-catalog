@@ -6,6 +6,14 @@ import * as useProductMock from '../hooks/useProduct';
 import * as useUpdateProductMock from '../hooks/useUpdateProduct';
 import { Product } from '../types';
 
+vi.mock('@auth0/auth0-react', () => ({
+    useAuth0: () => ({
+        isAuthenticated: true,
+        isLoading: false,
+        user: { name: 'Test Admin', email: 'admin@test.com' },
+    }),
+}));
+
 vi.mock('../hooks/useProduct', () => ({
     useProduct: vi.fn(),
 }));

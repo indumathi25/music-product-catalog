@@ -4,9 +4,21 @@ import { productService } from '../service';
 
 jest.mock('../service');
 
+jest.mock('express-oauth2-jwt-bearer', () => ({
+    auth: jest.fn(() => (req: any, _res: any, next: any) => {
+        if (req.headers.authorization) {
+            return next();
+        }
+        const error = new Error('UnauthorizedError') as any;
+        error.name = 'UnauthorizedError';
+        error.status = 401;
+        return next(error);
+    }),
+}));
+
 const mockService = productService as jest.Mocked<typeof productService>;
 
-const AUTH_HEADER = { 'x-api-key': process.env.API_KEY ?? 'fuga_secret_key_2026' };
+const AUTH_HEADER = { Authorization: 'Bearer mock_jwt_token' };
 
 const sampleProduct = {
     id: '550e8400-e29b-41d4-a716-446655440000',

@@ -1,9 +1,6 @@
 import { rateLimit } from 'express-rate-limit';
 
-/**
- * Global API rate limiter
- * Limits each IP to 1000 requests per 15 minutes
- */
+// Limits each IP to 1000 requests per 15 minutes
 export const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 1000,
@@ -17,10 +14,7 @@ export const globalLimiter = rateLimit({
     },
 });
 
-/**
- * Stricter limiter for write operations (POST, PUT, DELETE)
- * Limits each IP to 20 requests per 15 minutes
- */
+//Limits each IP to 20 requests per 15 minutes
 export const writeLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100,

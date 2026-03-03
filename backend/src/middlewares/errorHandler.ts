@@ -29,6 +29,16 @@ export const errorHandler = (
         return;
     }
 
+    if (err instanceof Error && err.name === 'UnauthorizedError') {
+        res.status(401).json({
+            error: {
+                code: 'UNAUTHORIZED',
+                message: 'Invalid or missing authentication token',
+            },
+        });
+        return;
+    }
+
     logger.error({ err }, 'Unhandled error');
 
     res.status(500).json({
