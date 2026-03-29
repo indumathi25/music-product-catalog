@@ -6,6 +6,12 @@ import * as useProductMock from '../hooks/useProduct';
 import * as useUpdateProductMock from '../hooks/useUpdateProduct';
 import { Product } from '../types';
 
+const mockDispatch = vi.fn();
+
+vi.mock('react-redux', () => ({
+    useDispatch: () => mockDispatch,
+}));
+
 vi.mock('@auth0/auth0-react', () => ({
     useAuth0: () => ({
         isAuthenticated: true,
@@ -136,10 +142,12 @@ describe('ProductDetailContainer', () => {
         fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
 
         await waitFor(() => {
-            expect(mockUpdateMutateAsync).toHaveBeenCalledWith({
-                id: VALID_UUID,
-                dto: expect.objectContaining({ title: 'Updated Song' }),
-            });
+            expect(mockUpdateMutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    id: VALID_UUID,
+                    title: 'Updated Song',
+                })
+            );
         });
 
         // It should exit edit mode immediately and show the edit button again.
