@@ -3,9 +3,29 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { CreateProductContainer } from '../containers/CreateProductContainer';
 import * as useCreateProductMock from '../hooks/useCreateProduct';
+import * as uploadImageMock from '../utils/uploadImage';
+
+const mockDispatch = vi.fn();
+
+vi.mock('react-redux', () => ({
+    useDispatch: () => mockDispatch,
+}));
+
+vi.mock('@auth0/auth0-react', () => ({
+    useAuth0: () => ({
+        getAccessTokenSilently: vi.fn().mockResolvedValue('mock-token'),
+        isAuthenticated: true,
+        isLoading: false,
+        user: { name: 'Test Admin', email: 'admin@test.com' },
+    }),
+}));
 
 vi.mock('../hooks/useCreateProduct', () => ({
     useCreateProduct: vi.fn(),
+}));
+
+vi.mock('../utils/uploadImage', () => ({
+    processAndUploadImage: vi.fn(),
 }));
 
 describe('CreateProductContainer', () => {
@@ -45,6 +65,14 @@ describe('CreateProductContainer', () => {
 
     it('submits the form and navigates on success', async () => {
         mockMutateAsync.mockResolvedValueOnce({});
+        const mockImageMetadata = {
+            url: 'http://localhost/cover.webp',
+            width: 600,
+            height: 600,
+            sizeBytes: 1000,
+            mimeType: 'image/webp',
+        };
+        vi.mocked(uploadImageMock.processAndUploadImage).mockResolvedValue(mockImageMetadata);
 
         render(
             <MemoryRouter>
@@ -61,19 +89,15 @@ describe('CreateProductContainer', () => {
         const file = new File(['dummy content'], 'cover.png', { type: 'image/png' });
         fireEvent.change(fileInput, { target: { files: [file] } });
 
-        // Wait for FileReader to finish and preview to show up
-        await waitFor(() => {
-            expect(screen.getByAltText(/Cover art preview/i)).toBeInTheDocument();
-        });
-
-        const submitButton = screen.getByRole('button', { name: /create product/i });
+        // Wait for upload to complete and button to be ready
+        const submitButton = await screen.findByRole('button', { name: /create product/i });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith(expect.objectContaining({
                 title: 'New Song',
                 artistName: 'New Artist',
-                coverArt: file
+                image: mockImageMetadata
             }));
         });
     });
