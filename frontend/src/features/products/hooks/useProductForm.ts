@@ -32,8 +32,9 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
             const token = await getAccessTokenSilently();
             const imageMetadata = await processAndUploadImage(file, token);
             dispatch({ type: 'SET_FILE_SUCCESS', metadata: imageMetadata });
-        } catch (error: any) {
-            dispatch({ type: 'SET_FILE_ERROR', error: error.message || 'Failed to upload image' });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
+            dispatch({ type: 'SET_FILE_ERROR', error: errorMessage });
         }
     };
 

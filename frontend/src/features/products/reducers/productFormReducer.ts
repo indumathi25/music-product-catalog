@@ -73,7 +73,7 @@ export function productFormReducer(
             return { ...state, errors: action.errors };
         case 'SET_SUBMITTING':
             return { ...state, isSubmitting: action.value };
-        case 'POPULATE':
+        case 'POPULATE': {
             const existingImage = action.product.images[0];
             const metadata = existingImage ? {
                 url: existingImage.url,
@@ -90,6 +90,7 @@ export function productFormReducer(
                 preview: existingImage?.url ?? null,
                 imageMetadata: metadata,
             };
+        }
         case 'RESET':
             return initialFormState;
         default:
