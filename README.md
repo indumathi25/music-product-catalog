@@ -16,7 +16,7 @@ FUGA is a purpose-built product management system tailored for music companies. 
 ### Service (Backend - Node.js)
 - **CRUD Operations**: Full Create, Read, Update, and Delete operations for managing products and artists.
 - **API Endpoints**: RESTful API designed with Zod validation, comprehensive error handling, and security hardening.
-- **Image Upload Handling**: Robust mechanism for handling cover art uploads using Multer, with support for both local and AWS S3 storage.
+- **Direct-to-Cloud Interoperability**: Generates secured AWS S3 Presigned URLs, offloading high-bandwidth file transfers entirely away from the Node.js event loop.
 - **API Documentation**: Interactive documentation available via Swagger/OpenAPI.
 
 ### Client Application (Frontend - React)
@@ -29,8 +29,8 @@ FUGA is a purpose-built product management system tailored for music companies. 
 
 | Layer | Technology |
 |-------|-----------|
-| **Backend** | Node.js · Express · TypeScript · PostgreSQL · Prisma · Auth0 (JWT) · Zod · Multer · Helmet |
-| **Frontend** | React 19 · React Compiler · Auth0 (PKCE) · Vite 7 · TypeScript · Tailwind CSS v4 · TanStack Query v5 |
+| **Backend** | Node.js · Express · TypeScript · PostgreSQL · Prisma · Auth0 (JWT) · Zod · AWS SDK 3 · Helmet |
+| **Frontend** | React 19 · React Compiler · Auth0 (PKCE) · Vite 7 · TypeScript · Tailwind CSS v4 · TanStack Query v5 · Image Compression |
 | **Infra** | Docker · Docker Compose (Dev/Prod) · GitHub Actions (CI) |
  
 ---
@@ -178,6 +178,9 @@ FUGA/
 | **Container-Presenter**| Decouples data fetching from UI, making components pure, highly testable, and reusable. |
 | **Defense in Depth** | Multiple security layers (Rate limit → Auth0 JWT → Validation) ensure robust API protection. |
 | **React Compiler** | Automatic memoization reduces manual `useMemo`/`useCallback` overhead while ensuring 60FPS UI. |
+| **Relational Metadata**| Moving from a flat URL to an `Image` model allows the UI to reserve space (Width/Height) accurately, eliminating Layout Shift. |
+| **Shimmer UI (Skeleton)**| Implements pure-CSS native `animate-pulse` and `opacity` transitions while images load dynamically over the network, providing instant, premium perceived performance during infinite scrolling. |
+| **Optimistic Direct Uploads** | Client-side image compression (`browser-image-compression`) combined with S3 Presigned URLs shifts compute costs to the browser, eliminating the need for expensive AWS Lambda triggers or heavy Node.js memory buffers. |
 
 ---
 
@@ -192,7 +195,6 @@ Fully automated CI pipeline on every push:
 
 ## Future Enhancements & Architectural Trade-offs
 
-### 1. Direct S3 Uploads via Pre-signed URLs for Large Files
-Currently, the frontend restricts image uploads to 5MB, and the Node.js backend processes these images using `sharp` (resizing and WebP conversion) before pushing to S3. 
-- **Enhancement**: To support massive high-resolution imagery without crashing the Node.js server (Out-Of-Memory errors), the backend can generate a **Pre-signed S3 PUT URL**. The frontend will use this URL to stream the raw file directly to the S3 bucket.
-- **Trade-off**: By bypassing the backend, the `sharp` optimization step is lost. To maintain the high-performance UX of the `ProductGrid`, an **AWS Lambda function** (triggered by an S3 put event) would need to be introduced to asynchronously optimize the newly uploaded images before updating the catalog.
+### 1. Multi-Artist Collaborations & Secondary Assets
+- **Implementation**: The current schema links images directly to artists.
+- **Enhancement**: Scaling this to support multi-artist tracks and "Artist Libraries" where common brand assets (logos, profile banners) can be managed once and reused across hundreds of products.

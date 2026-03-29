@@ -66,8 +66,7 @@ describe('useCreateProduct', () => {
 
         const { result } = renderHook(() => useCreateProduct(), { wrapper });
 
-        const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const dto = { title: 'New Product', artistName: 'Artist', coverArt: mockFile };
+        const dto = { title: 'New Product', artistName: 'Artist', image: { url: 'http://example.com/art.jpg', width: 500, height: 500, sizeBytes: 1000, mimeType: 'image/jpeg' } };
 
         result.current.mutate(dto);
 
@@ -88,8 +87,7 @@ describe('useCreateProduct', () => {
 
         const { result } = renderHook(() => useCreateProduct(), { wrapper });
 
-        const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const dto = { title: 'New Product', artistName: 'Artist', coverArt: mockFile };
+        const dto = { title: 'New Product', artistName: 'Artist', image: { url: 'http://example.com/art.jpg', width: 500, height: 500, sizeBytes: 1000, mimeType: 'image/jpeg' } };
 
         result.current.mutate(dto);
 

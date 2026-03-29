@@ -2,10 +2,7 @@ import { ProductFormState } from '../reducers/productFormReducer';
 
 const MAX_LENGTH = 200;
 
-export function validateForm(
-    state: ProductFormState,
-    requireFile = true,
-): ProductFormState['errors'] {
+export function validateForm(state: ProductFormState): ProductFormState['errors'] {
     const errors: ProductFormState['errors'] = {};
 
     const validateText = (
@@ -23,7 +20,7 @@ export function validateForm(
     validateText(state.title, 'title', 'Title');
     validateText(state.artistName, 'artistName', 'Artist name');
 
-    if (requireFile && !state.file) {
+    if (!state.file && !state.preview) {
         errors.file = 'Cover art is required';
     }
 

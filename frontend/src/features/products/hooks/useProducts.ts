@@ -1,12 +1,12 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { productsApi } from '../api';
 import { ProductFilterParams } from '../types';
-import { QUERY_KEYS } from '../../../constants';
+import { QUERY_KEYS, PRODUCT_LIST_LIMIT } from '../../../constants';
 
 export const PRODUCTS_QUERY_KEY = QUERY_KEYS.PRODUCTS;
 
 export function useProducts(params: Omit<ProductFilterParams, 'page'> = {}) {
-    const limit = params.limit ?? 12;
+    const limit = params.limit ?? PRODUCT_LIST_LIMIT;
 
     return useInfiniteQuery({
         queryKey: [...PRODUCTS_QUERY_KEY, params],

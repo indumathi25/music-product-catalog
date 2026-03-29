@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { productService } from './service';
 import { CreateProductInput, UpdateProductInput, ProductIdParam } from './schema';
-import { AppError } from '../../middlewares/errorHandler';
+
 import { storageService } from '../../lib/storage';
 
 export const productController = {
@@ -47,17 +47,23 @@ export const productController = {
         }
     },
 
+    getUploadUrl: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { contentType } = req.body;
+            const urls = await storageService.generatePresignedUrl(contentType);
+            res.json({ data: urls });
+        } catch (err) {
+            next(err);
+        }
+    },
+
     create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            if (!req.file) {
-                throw new AppError(400, 'MISSING_COVER_ART', 'Cover art image is required');
-            }
             const body = req.body as CreateProductInput;
-            const imageMetadata = await storageService.uploadFile(req.file);
             const product = await productService.create({
                 title: body.title,
                 artistName: body.artistName,
-                image: imageMetadata,
+                image: body.image,
             });
             res.status(201).json({ data: product });
         } catch (err) {
@@ -69,11 +75,10 @@ export const productController = {
         try {
             const { id } = req.params as unknown as ProductIdParam;
             const body = req.body as UpdateProductInput;
-            const imageMetadata = req.file ? await storageService.uploadFile(req.file) : undefined;
             const product = await productService.update(id, {
                 title: body.title,
                 artistName: body.artistName,
-                image: imageMetadata,
+                image: body.image,
             });
             res.json({ data: product });
         } catch (err) {

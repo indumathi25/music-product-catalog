@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store';
 import { clearSearchQuery } from '@/store/slices/productSlice';
-import { MESSAGES } from '@/constants';
+import { MESSAGES, PRODUCT_LIST_LIMIT } from '@/constants';
 
 export function ProductListContainer() {
     const dispatch = useDispatch<AppDispatch>();
@@ -37,7 +37,7 @@ export function ProductListContainer() {
         handleDeleteCancel
     } = useProductDeletion();
 
-    if (isLoading && !allProducts.length) return <ProductGridSkeleton count={12} />;
+    if (isLoading && !allProducts.length) return <ProductGridSkeleton count={PRODUCT_LIST_LIMIT} />;
 
     if (isError) {
         return (
@@ -73,7 +73,7 @@ export function ProductListContainer() {
                             ? {
                                 label: 'Clear filters',
                                 onClick: () => {
-                                    setFilters({ limit: 12, artistName: '' });
+                                    setFilters({ limit: PRODUCT_LIST_LIMIT, artistName: '' });
                                     dispatch(clearSearchQuery());
                                 }
                             }

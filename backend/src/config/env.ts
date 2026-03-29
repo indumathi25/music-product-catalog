@@ -4,7 +4,7 @@ const envSchema = z.object({
     PORT: z.string().default('4000').transform(Number),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    UPLOADS_DIR: z.string().default('./uploads'),
+
     CORS_ORIGIN: z.string().default('http://localhost:5173'),
     MAX_FILE_SIZE_MB: z.string().default('5').transform(Number),
     STORAGE_PROVIDER: z.enum(['local', 's3']).default('local'),

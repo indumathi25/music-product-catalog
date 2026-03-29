@@ -70,7 +70,7 @@ describe('useUpdateProduct', () => {
 
         const dto = { title: 'Updated Product' };
 
-        result.current.mutate({ id: VALID_UUID, dto });
+        result.current.mutate({ id: VALID_UUID, ...dto });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 

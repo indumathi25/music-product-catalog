@@ -1,0 +1,3 @@
+export const PAGINATION_CONSTANTS = {
+    DEFAULT_LIMIT: 8,
+};

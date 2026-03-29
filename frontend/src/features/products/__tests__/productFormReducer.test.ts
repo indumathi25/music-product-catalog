@@ -27,7 +27,7 @@ describe('productFormReducer', () => {
     it('SET_FILE stores file and preview', () => {
         const file = new File(['x'], 'cover.jpg', { type: ALLOWED_IMAGE_TYPES[0] });
         const next = productFormReducer(initialFormState, {
-            type: 'SET_FILE',
+            type: 'SET_FILE_IN_PROGRESS',
             file,
             preview: `data:${ALLOWED_IMAGE_TYPES[0]};base64,test`,
         });
@@ -57,7 +57,7 @@ describe('productFormReducer', () => {
 
 describe('validateForm', () => {
     it('returns errors for empty fields', () => {
-        const errors = validateForm(initialFormState, true);
+        const errors = validateForm(initialFormState);
         expect(errors.title).toBeDefined();
         expect(errors.artistName).toBeDefined();
         expect(errors.file).toBeDefined();
@@ -66,7 +66,7 @@ describe('validateForm', () => {
     it('passes when all fields are filled', () => {
         const file = new File(['x'], 'cover.jpg', { type: ALLOWED_IMAGE_TYPES[0] });
         const state = { ...initialFormState, title: 'Abbey Road', artistName: 'The Beatles', file };
-        const errors = validateForm(state, true);
+        const errors = validateForm(state);
         expect(Object.keys(errors)).toHaveLength(0);
     });
 });

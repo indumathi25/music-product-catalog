@@ -3,6 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { useDebounce } from '@/hooks/useDebounce';
+import { PRODUCT_LIST_LIMIT } from '@/constants';
 import { useProducts } from './useProducts';
 import { Product, ProductFilterParams } from '../types';
 
@@ -10,7 +11,7 @@ export function useProductList() {
     const searchQuery = useSelector((state: RootState) => state.products.searchQuery);
     const [filters, setFilters] = useState<Omit<ProductFilterParams, 'search' | 'page'>>({
         artistName: '',
-        limit: 12,
+        limit: PRODUCT_LIST_LIMIT,
     });
 
     const debouncedSearch = useDebounce(searchQuery, 400);

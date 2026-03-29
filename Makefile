@@ -1,4 +1,4 @@
-.PHONY: up down logs db-migrate db-deploy db-seed test lint clean
+.PHONY: up down restart logs db-migrate db-deploy db-seed test lint clean
 
 # Commands
 COMPOSE := docker compose
@@ -11,6 +11,9 @@ up:
 
 down:
 	$(COMPOSE) down
+
+restart:
+	$(COMPOSE) restart
 
 logs:
 	$(COMPOSE) logs -f

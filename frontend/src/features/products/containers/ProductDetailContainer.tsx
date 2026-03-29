@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProduct } from '../hooks/useProduct';
+import { useDispatch } from 'react-redux';
+import { addToast } from '../../../store/slices/uiSlice';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
 import { ProductForm } from '../components/ProductForm';
 import { ProductDetailView } from '../components/ProductDetailView';
@@ -17,15 +19,19 @@ export function ProductDetailContainer() {
     const { data: product, isLoading: isFetching, isError } = useProduct(productId);
     const updateMutation = useUpdateProduct();
 
+    const dispatch = useDispatch();
+
     const handleSubmit = async (state: ProductFormState) => {
         if (!productId) return;
+        if (state.uploadStatus === 'uploading') {
+            dispatch(addToast({ type: 'info', message: 'Wait for image to finish uploading!' }));
+            return;
+        }
         await updateMutation.mutateAsync({
             id: productId,
-            dto: {
-                title: state.title,
-                artistName: state.artistName,
-                coverArt: state.file || undefined,
-            },
+            title: state.title,
+            artistName: state.artistName,
+            image: state.imageMetadata || undefined,
         });
         setIsEditing(false);
     };

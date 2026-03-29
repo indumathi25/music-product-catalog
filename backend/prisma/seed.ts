@@ -1,6 +1,4 @@
 import { prisma } from '../src/lib/prisma';
-import { storageService } from '../src/lib/storage';
-import { Buffer } from 'buffer';
 
 const products = [
     { name: 'Abbey Road', artist: 'The Beatles' },
@@ -69,40 +67,25 @@ async function main() {
         try {
             console.log(`[${i + 1}/${products.length}] Processing "${p.name}"...`);
 
-            // 1. Fetch image
-            const response = await fetch(placeholderUrl);
-            if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
-
-            const arrayBuffer = await response.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-
-            // 2. Upload to S3 (Mocking Multer file object)
-            const imageMetadata = await storageService.uploadFile({
-                buffer,
-                mimetype: 'image/jpeg',
-                originalname: `${p.name.replace(/\s+/g, '-').toLowerCase()}.webp`,
-                size: buffer.byteLength,
-            } as any);
-
-            // 3. Find or Create Artist
+            // 1. Find or Create Artist
             const artist = await prisma.artist.upsert({
                 where: { name: p.artist },
                 update: {},
                 create: { name: p.artist },
             });
 
-            // 4. Create DB record with Join
+            // 2. Create DB record with the direct LoremFlickr URL
             await prisma.product.create({
                 data: {
                     title: p.name,
                     artist: { connect: { id: artist.id } },
                     images: {
                         create: {
-                            url: imageMetadata.url,
-                            width: imageMetadata.width,
-                            height: imageMetadata.height,
-                            size_bytes: imageMetadata.sizeBytes,
-                            mime_type: imageMetadata.mimeType,
+                            url: placeholderUrl,
+                            width: 400,
+                            height: 400,
+                            size_bytes: 50000,
+                            mime_type: 'image/jpeg',
                             alt_text: `Cover art for ${p.name} by ${p.artist}`,
                             artist: { connect: { id: artist.id } },
                         }

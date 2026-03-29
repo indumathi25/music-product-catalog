@@ -17,6 +17,7 @@ export const UI_CONSTANTS = {
             END_OF_CATALOG: "✨ You've reached the end of the catalog",
         },
     },
+    PRODUCT_LIST_LIMIT: 8,
 } as const;
 
 export const ALLOWED_IMAGE_TYPES = UI_CONSTANTS.ALLOWED_IMAGE_TYPES;
@@ -24,3 +25,4 @@ export const MAX_FILE_SIZE_BYTES = UI_CONSTANTS.MAX_FILE_SIZE_BYTES;
 export const ACCEPTED_IMAGE_TYPES_STRING = UI_CONSTANTS.ALLOWED_IMAGE_TYPES.join(',');
 export const MAX_FILE_SIZE_MB = UI_CONSTANTS.MAX_FILE_SIZE_BYTES / (1024 * 1024);
 export const MESSAGES = UI_CONSTANTS.MESSAGES;
+export const PRODUCT_LIST_LIMIT = UI_CONSTANTS.PRODUCT_LIST_LIMIT;

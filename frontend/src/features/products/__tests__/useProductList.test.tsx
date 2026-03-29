@@ -6,6 +6,7 @@ import * as useProductsMock from '../hooks/useProducts';
 import { Product, ApiListResponse } from '../types';
 import { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
+import { PRODUCT_LIST_LIMIT } from '@/constants';
 
 vi.mock('../hooks/useProducts', () => ({
     useProducts: vi.fn(),
@@ -59,7 +60,7 @@ describe('useProductList', () => {
     it('initializes with default filters', () => {
         const { result } = renderHook(() => useProductList(), { wrapper });
 
-        expect(result.current.filters).toEqual({ artistName: '', limit: 12 });
+        expect(result.current.filters).toEqual({ artistName: '', limit: PRODUCT_LIST_LIMIT });
         expect(result.current.allProducts).toEqual([]);
     });
 
@@ -67,7 +68,7 @@ describe('useProductList', () => {
         const { result } = renderHook(() => useProductList(), { wrapper });
 
         act(() => {
-            result.current.setFilters({ limit: 12, artistName: 'Beatles' });
+            result.current.setFilters({ limit: PRODUCT_LIST_LIMIT, artistName: 'Beatles' });
         });
 
         expect(result.current.filters.artistName).toBe('Beatles');
@@ -86,7 +87,7 @@ describe('useProductList', () => {
         const { result } = renderHook(() => useProductList(), { wrapper });
 
         act(() => {
-            result.current.setFilters({ limit: 12, artistName: 'Beatles' });
+            result.current.setFilters({ limit: PRODUCT_LIST_LIMIT, artistName: 'Beatles' });
         });
 
         expect(result.current.allProducts).toHaveLength(2);

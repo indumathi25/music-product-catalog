@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth0 } from '@auth0/auth0-react';
 import { productsApi } from '../api';
-import { UpdateProductDto } from '../types';
 import { PRODUCTS_QUERY_KEY } from './useProducts';
 import { useDispatch } from 'react-redux';
 import { addToast } from '../../../store/slices/uiSlice';
@@ -13,9 +12,9 @@ export function useUpdateProduct() {
     const { getAccessTokenSilently } = useAuth0();
 
     return useMutation({
-        mutationFn: async ({ id, dto }: { id: string; dto: UpdateProductDto }) => {
+        mutationFn: async ({ id, title, artistName, image }: { id: string; title?: string; artistName?: string; image?: { url: string; width: number; height: number; sizeBytes: number; mimeType: string } }) => {
             const token = await getAccessTokenSilently();
-            return productsApi.update(id, dto, token);
+            return productsApi.update(id, { title, artistName, image }, token);
         },
         onSuccess: (updatedProduct, { id }) => {
             queryClient.setQueryData(QUERY_KEYS.PRODUCT(id), updatedProduct);

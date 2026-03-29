@@ -19,23 +19,28 @@ export const productsApi = {
         return response.data;
     },
 
+    getUploadUrl: async (contentType: string, accessToken?: string): Promise<{ uploadUrl: string, finalUrl: string }> => {
+        const response = await apiClient.post<ApiSingleResponse<{ uploadUrl: string, finalUrl: string }>>(
+            `${API_PATHS.PRODUCTS.BASE}/upload-url`,
+            { contentType },
+            accessToken
+        );
+        return response.data;
+    },
+
     create: async (dto: CreateProductDto, accessToken?: string): Promise<Product> => {
-        const form = new FormData();
-        form.append('title', dto.title);
-        form.append('artistName', dto.artistName);
-        form.append('coverArt', dto.coverArt);
-        const response = await apiClient.post<ApiSingleResponse<Product>>(API_PATHS.PRODUCTS.BASE, form, accessToken);
+        const response = await apiClient.post<ApiSingleResponse<Product>>(
+            API_PATHS.PRODUCTS.BASE, 
+            dto as unknown as Record<string, unknown>, 
+            accessToken
+        );
         return response.data;
     },
 
     update: async (id: string, dto: UpdateProductDto, accessToken?: string): Promise<Product> => {
-        const form = new FormData();
-        if (dto.title) form.append('title', dto.title);
-        if (dto.artistName) form.append('artistName', dto.artistName);
-        if (dto.coverArt) form.append('coverArt', dto.coverArt);
         const response = await apiClient.put<ApiSingleResponse<Product>>(
             API_PATHS.PRODUCTS.BY_ID(id),
-            form,
+            dto as unknown as Record<string, unknown>,
             accessToken,
         );
         return response.data;

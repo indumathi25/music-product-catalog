@@ -1,13 +1,13 @@
 import { productRepository } from './repository';
 import { AppError } from '../../middlewares/errorHandler';
-import { HttpStatus, ErrorCodes } from '../../constants';
+import { HttpStatus, ErrorCodes, PAGINATION_CONSTANTS } from '../../constants';
 import { storageService } from '../../lib/storage';
 import { productMapper } from './mapper';
 import { ProductResponse, CreateProductDto, UpdateProductDto, GetAllProductsQuery, PaginatedResponse } from './types';
 
 export const productService = {
     getAll: async (query: GetAllProductsQuery): Promise<PaginatedResponse<ProductResponse>> => {
-        const { search, artistName, page = 1, limit = 10 } = query;
+        const { search, artistName, page = 1, limit = PAGINATION_CONSTANTS.DEFAULT_LIMIT } = query;
         const skip = (page - 1) * limit;
         const take = limit;
 

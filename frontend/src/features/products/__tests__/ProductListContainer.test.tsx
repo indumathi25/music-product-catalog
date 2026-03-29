@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { ProductListContainer } from '../containers/ProductListContainer';
 import * as useProductListMock from '../hooks/useProductList';
 import * as useProductDeletionMock from '../hooks/useProductDeletion';
-import { MESSAGES } from '@/constants';
+import { MESSAGES, PRODUCT_LIST_LIMIT } from '@/constants';
 import { Product } from '../types';
 
 const mockDispatch = vi.fn();
@@ -36,7 +36,7 @@ describe('ProductListContainer', () => {
     it('renders skeleton loader when loading initially', () => {
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
             searchQuery: '',
-            filters: { artistName: '', limit: 12 },
+            filters: { artistName: '', limit: PRODUCT_LIST_LIMIT },
             setFilters: vi.fn(),
             allProducts: [],
             filteredProducts: [],
@@ -62,7 +62,7 @@ describe('ProductListContainer', () => {
     it('renders an error message when error occurs', () => {
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
             searchQuery: '',
-            filters: { artistName: '', limit: 12 },
+            filters: { artistName: '', limit: PRODUCT_LIST_LIMIT },
             setFilters: vi.fn(),
             allProducts: [],
             filteredProducts: [],
@@ -88,7 +88,7 @@ describe('ProductListContainer', () => {
     it('renders empty state when no products', () => {
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
             searchQuery: '',
-            filters: { artistName: '', limit: 12 },
+            filters: { artistName: '', limit: PRODUCT_LIST_LIMIT },
             setFilters: vi.fn(),
             allProducts: [],
             filteredProducts: [],
@@ -113,7 +113,7 @@ describe('ProductListContainer', () => {
     it('renders empty state for filters when products exist but are filtered out', () => {
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
             searchQuery: 'Test',
-            filters: { artistName: '', limit: 12 },
+            filters: { artistName: '', limit: PRODUCT_LIST_LIMIT },
             setFilters: vi.fn(),
             allProducts: [{ id: 'uuid-1', title: 'A', artistName: 'A', images: [], createdAt: '', updatedAt: '' }],
             filteredProducts: [], // Filtered out
@@ -143,7 +143,7 @@ describe('ProductListContainer', () => {
 
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
             searchQuery: '',
-            filters: { artistName: '', limit: 12 },
+            filters: { artistName: '', limit: PRODUCT_LIST_LIMIT },
             setFilters: vi.fn(),
             allProducts: mockProducts,
             filteredProducts: mockProducts,
@@ -173,7 +173,7 @@ describe('ProductListContainer', () => {
 
         vi.mocked(useProductListMock.useProductList).mockReturnValue({
             searchQuery: '',
-            filters: { artistName: '', limit: 12 },
+            filters: { artistName: '', limit: PRODUCT_LIST_LIMIT },
             setFilters: vi.fn(),
             allProducts: mockProducts,
             filteredProducts: mockProducts,

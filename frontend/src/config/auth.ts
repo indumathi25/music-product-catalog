@@ -12,7 +12,7 @@ export const AUTH0_CONFIG = {
     clientId: getEnvVar('VITE_AUTH0_CLIENT_ID'),
     audience: getEnvVar('VITE_AUTH0_AUDIENCE'),
     redirectUri: window.location.origin,
-    scope: 'openid profile email',
+    scope: 'openid profile email offline_access',
     cacheLocation: 'localstorage' as const,
     refreshTokens: true,
 };

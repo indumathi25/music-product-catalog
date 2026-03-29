@@ -19,7 +19,7 @@ export function ProductForm({
     initialData,
     onCancel,
 }: ProductFormProps) {
-    const { state, handleFile, handleSubmit, handleFieldChange, handleClearFile } = useProductForm({
+    const { state, handleFile, handleSubmit, handleRetryUpload, handleFieldChange, handleClearFile } = useProductForm({
         onSubmit,
         initialData,
     });
@@ -48,7 +48,9 @@ export function ProductForm({
                 preview={state.preview}
                 fileName={state.file?.name}
                 error={state.errors.file}
+                status={state.uploadStatus}
                 onFileSelect={handleFile}
+                onRetry={handleRetryUpload}
                 onClear={handleClearFile}
             />
 
@@ -65,11 +67,11 @@ export function ProductForm({
                 )}
                 <button
                     type="submit"
-                    disabled={state.isSubmitting || isLoading}
-                    aria-disabled={state.isSubmitting || isLoading}
+                    disabled={state.isSubmitting || isLoading || state.uploadStatus === 'uploading'}
+                    aria-disabled={state.isSubmitting || isLoading || state.uploadStatus === 'uploading'}
                     className="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-500 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none sm:px-8"
                 >
-                    {state.isSubmitting || isLoading ? (
+                    {state.isSubmitting || isLoading || state.uploadStatus === 'uploading' ? (
                         <span className="flex items-center justify-center gap-2">
                             <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

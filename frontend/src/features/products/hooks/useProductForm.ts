@@ -1,4 +1,6 @@
 import { useReducer, useEffect, type SubmitEvent } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { processAndUploadImage } from '../utils/uploadImage';
 import {
     productFormReducer,
     initialFormState,
@@ -15,12 +17,25 @@ interface UseProductFormOptions {
 
 export function useProductForm({ onSubmit, initialData }: UseProductFormOptions) {
     const [state, dispatch] = useReducer(productFormReducer, initialFormState);
+    const { getAccessTokenSilently } = useAuth0();
 
     useEffect(() => {
         if (initialData) {
             dispatch({ type: 'POPULATE', product: initialData });
         }
     }, [initialData]);
+
+    const performUpload = async (file: File, preview: string) => {
+        dispatch({ type: 'SET_FILE_IN_PROGRESS', file, preview });
+
+        try {
+            const token = await getAccessTokenSilently();
+            const imageMetadata = await processAndUploadImage(file, token);
+            dispatch({ type: 'SET_FILE_SUCCESS', metadata: imageMetadata });
+        } catch (error: any) {
+            dispatch({ type: 'SET_FILE_ERROR', error: error.message || 'Failed to upload image' });
+        }
+    };
 
     const handleFile = (file: File) => {
         if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
@@ -34,16 +49,21 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
             dispatch({ type: 'SET_ERRORS', errors: { file: 'Image must be under 5 MB' } });
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) =>
-            dispatch({ type: 'SET_FILE', file, preview: e.target?.result as string });
-        reader.readAsDataURL(file);
+        
+        const preview = URL.createObjectURL(file);
+        performUpload(file, preview);
+    };
+
+    const handleRetryUpload = () => {
+        if (state.file && state.preview) {
+            performUpload(state.file, state.preview);
+        }
     };
 
     const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const isUpdate = !!initialData;
-        const errors = validateForm(state, !isUpdate);
+        const errors = validateForm(state);
         if (Object.keys(errors).length > 0) {
             dispatch({ type: 'SET_ERRORS', errors });
             return;
@@ -71,6 +91,7 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         state,
         handleFile,
         handleSubmit,
+        handleRetryUpload,
         handleFieldChange,
         handleClearFile,
     };

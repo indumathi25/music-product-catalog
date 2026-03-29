@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { productController } from './controller';
 import { validate } from '../../middlewares/validate';
-import { upload } from '../../middlewares/upload';
-import { createProductSchema, updateProductSchema, productIdSchema } from './schema';
+import { createProductSchema, updateProductSchema, productIdSchema, uploadUrlSchema } from './schema';
 
 import { authMiddleware } from '../../middlewares/auth';
 import { writeLimiter } from '../../middlewares/rateLimiter';
@@ -17,9 +16,15 @@ router.get('/:id', validate(productIdSchema, 'params'), productController.getByI
 router.use(authMiddleware);
 
 router.post(
+    '/upload-url',
+    writeLimiter,
+    validate(uploadUrlSchema),
+    productController.getUploadUrl
+);
+
+router.post(
     '/',
     writeLimiter,
-    upload.single('coverArt'),
     validate(createProductSchema),
     productController.create,
 );
@@ -28,7 +33,6 @@ router.put(
     '/:id',
     writeLimiter,
     validate(productIdSchema, 'params'),
-    upload.single('coverArt'),
     validate(updateProductSchema),
     productController.update,
 );

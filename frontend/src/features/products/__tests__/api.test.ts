@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { productsApi } from '../api';
 import { apiClient } from '@/lib/apiClient';
+import { PRODUCT_LIST_LIMIT } from '@/constants';
 
 vi.mock('@/lib/apiClient', () => ({
     apiClient: {
@@ -19,7 +20,7 @@ describe('productsApi', () => {
     });
 
     it('getAll calls apiClient.get with correct URL and params', async () => {
-        const mockResponse = { data: { data: [], total: 0, page: 1, limit: 12 } };
+        const mockResponse = { data: { data: [], total: 0, page: 1, limit: PRODUCT_LIST_LIMIT } };
         vi.mocked(apiClient.get).mockResolvedValue(mockResponse);
 
         const params = { search: 'test', page: 2 };
@@ -41,14 +42,13 @@ describe('productsApi', () => {
         const mockResponse = { data: { data: { id: VALID_UUID, title: 'New Product' } } };
         vi.mocked(apiClient.post).mockResolvedValue(mockResponse);
 
-        const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const dto = { title: 'New Product', artistName: 'Artist', coverArt: mockFile };
+        const dto = { title: 'New Product', artistName: 'Artist', image: { url: 'http://loc', width: 0, height: 0, sizeBytes: 0, mimeType: 'image/jpeg' } };
 
         await productsApi.create(dto);
 
         expect(apiClient.post).toHaveBeenCalledWith(
             '/api/products',
-            expect.any(FormData),
+            dto,
             undefined
         );
     });
@@ -62,7 +62,7 @@ describe('productsApi', () => {
 
         expect(apiClient.put).toHaveBeenCalledWith(
             `/api/products/${VALID_UUID}`,
-            expect.any(FormData),
+            dto,
             undefined
         );
     });

@@ -20,13 +20,25 @@ export interface Product {
 export interface CreateProductDto {
     title: string;
     artistName: string;
-    coverArt: File;
+    image: {
+        url: string;
+        width: number;
+        height: number;
+        sizeBytes: number;
+        mimeType: string;
+    };
 }
 
 export interface UpdateProductDto {
     title?: string;
     artistName?: string;
-    coverArt?: File;
+    image?: {
+        url: string;
+        width: number;
+        height: number;
+        sizeBytes: number;
+        mimeType: string;
+    };
 }
 
 export interface ApiListResponse<T> {

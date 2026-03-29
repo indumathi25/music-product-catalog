@@ -29,14 +29,14 @@ services:
       - ./backend/.env
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@db:5432/fuga}
-      UPLOADS_DIR: ${UPLOADS_DIR:-/app/uploads}
+
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
       - "${BACKEND_PORT:-4000}:4000"
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - uploads_data:/app/uploads
+
     depends_on:
       db:
         condition: service_healthy
@@ -66,4 +66,4 @@ services:
 
 volumes:
   postgres_data:
-  uploads_data:
+

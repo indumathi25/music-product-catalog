@@ -3,8 +3,8 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
-import { env } from './env';
 import { logger } from '../lib/logger';
+import { AppConstants } from '../constants';
 
 export const setupSwagger = (app: Express) => {
     try {
@@ -19,7 +19,7 @@ export const setupSwagger = (app: Express) => {
         const swaggerSpec = yaml.load(fileContent) as Record<string, any>;
 
         if (swaggerSpec && swaggerSpec.servers) {
-            swaggerSpec.servers = [{ url: `http://localhost:${env.PORT}` }];
+            swaggerSpec.servers = [{ url: AppConstants.DEFAULT_API_URL }];
         }
 
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
