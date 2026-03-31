@@ -34,6 +34,8 @@ const PageLoader = memo(function PageLoader() {
     );
 });
 
+import { ToastContainer } from '@/components/ToastContainer';
+
 function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex min-h-screen flex-col bg-gray-50">
@@ -46,6 +48,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                 {children}
             </main>
             <Footer />
+            <ToastContainer />
         </div>
     );
 }

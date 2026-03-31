@@ -1,8 +1,10 @@
 import { ProductFormState } from '../reducers/productFormReducer';
 import { Product } from '../types';
 import { useProductForm } from '../hooks/useProductForm';
+import { useArtistLibrary } from '../hooks/useArtistLibrary';
 import { FormInput } from './FormInput';
 import { CoverArtUpload } from './CoverArtUpload';
+import { ArtistLibraryPicker } from './ArtistLibraryPicker';
 
 interface ProductFormProps {
     onSubmit: (state: ProductFormState) => Promise<void>;
@@ -19,10 +21,14 @@ export function ProductForm({
     initialData,
     onCancel,
 }: ProductFormProps) {
-    const { state, handleFile, handleSubmit, handleRetryUpload, handleFieldChange, handleClearFile } = useProductForm({
+    const { state, handleFile, handleSubmit, handleRetryUpload, handleFieldChange, handleClearFile, handleSelectFromLibrary } = useProductForm({
         onSubmit,
         initialData,
     });
+
+    const { libraryImages } = useArtistLibrary(state.artistName);
+
+    const otherLibraryImages = libraryImages.filter(img => img.url !== state.preview);
 
     return (
         <form onSubmit={handleSubmit} noValidate aria-label="Product form" className="space-y-6">
@@ -54,6 +60,12 @@ export function ProductForm({
                 onClear={handleClearFile}
             />
 
+            <ArtistLibraryPicker
+                images={otherLibraryImages}
+                selectedUrl={state.preview}
+                onSelect={handleSelectFromLibrary}
+            />
+
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 {onCancel && (
                     <button
@@ -71,13 +83,13 @@ export function ProductForm({
                     aria-disabled={state.isSubmitting || isLoading || state.uploadStatus === 'uploading'}
                     className="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-500 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none sm:px-8"
                 >
-                    {state.isSubmitting || isLoading || state.uploadStatus === 'uploading' ? (
+                    {(state.isSubmitting || isLoading) ? (
                         <span className="flex items-center justify-center gap-2">
                             <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v8H4Z" />
                             </svg>
-                            Saving…
+                            {state.uploadStatus === 'uploading' ? 'Uploading…' : 'Saving…'}
                         </span>
                     ) : (
                         submitLabel

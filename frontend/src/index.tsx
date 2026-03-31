@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
-import { Toaster, toast } from 'react-hot-toast';
+import { addToast } from './store/slices/uiSlice';
 import { store, persistor } from './store';
 import { App } from './app/App';
 import { AuthProvider } from './components/AuthProvider';
@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
     }),
     mutationCache: new MutationCache({
         onError: (error) => {
-            toast.error(error.message || 'Something went wrong');
+            store.dispatch(addToast({ message: error.message || 'Something went wrong', type: 'error' }));
         },
     }),
     defaultOptions: {
@@ -41,7 +41,6 @@ root.render(
                 <QueryClientProvider client={queryClient}>
                     <BrowserRouter>
                         <AuthProvider>
-                            <Toaster position="top-right" />
                             <App />
                         </AuthProvider>
                     </BrowserRouter>

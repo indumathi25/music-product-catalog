@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { useDebounce } from '@/hooks/useDebounce';
 import { PRODUCT_LIST_LIMIT } from '@/constants';
-import { useProducts } from './useProducts';
-import { Product, ProductFilterParams } from '../types';
+import { useProductSearch } from './useProductSearch';
+import { ProductFilterParams } from '../types';
 
 export function useProductList() {
     const searchQuery = useSelector((state: RootState) => state.products.searchQuery);
@@ -15,17 +15,21 @@ export function useProductList() {
     });
 
     const debouncedSearch = useDebounce(searchQuery, 400);
+    const debouncedArtist = useDebounce(filters.artistName || '', 400);
     const { ref, inView } = useInView();
 
     const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        isLoading,
-        isError,
-        error
-    } = useProducts({ search: debouncedSearch });
+        results: allProducts,
+        totalCount,
+        serverQuery: {
+            fetchNextPage,
+            hasNextPage,
+            isFetchingNextPage,
+            isLoading,
+            isError,
+            error
+        }
+    } = useProductSearch({ search: debouncedSearch, artistName: debouncedArtist });
 
     useEffect(() => {
         if (inView && hasNextPage && !isFetchingNextPage) {
@@ -33,18 +37,12 @@ export function useProductList() {
         }
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    const allProducts = data?.pages.flatMap((page) => page.data) ?? [];
-
-    const filteredProducts = allProducts.filter((product: Product) => {
-        return !filters.artistName || product.artistName.toLowerCase().includes(filters.artistName.toLowerCase());
-    });
-
     return {
         searchQuery,
         filters,
         setFilters,
         allProducts,
-        filteredProducts,
+        totalCount,
         isLoading,
         isError,
         error,

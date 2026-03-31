@@ -14,7 +14,7 @@ COPY . .
 EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host"]
 
-# ── Stage 1: Builder ──────────────────────────────────────────────────────────
+# ── Stage 1: Builder 
 FROM node:22-alpine AS builder
 
 
@@ -29,7 +29,7 @@ ENV VITE_API_URL=$VITE_API_URL
 COPY . .
 RUN npm run build
 
-# ── Stage 2: Production (nginx) ───────────────────────────────────────────────
+# ── Stage 2: Production (nginx) 
 FROM nginx:1.27-alpine AS production
 
 # Copy Vite build output

@@ -6,7 +6,7 @@ interface CoverArtUploadProps {
     preview: string | null;
     fileName?: string;
     error?: string;
-    status: 'idle' | 'uploading' | 'success' | 'error';
+    status: 'idle' | 'selected' | 'uploading' | 'success' | 'error';
     onFileSelect: (file: File) => void;
     onRetry?: () => void;
     onClear: () => void;
@@ -56,16 +56,9 @@ export function CoverArtUpload({
                         <img
                             src={preview}
                             alt="Cover art preview"
-                            className={`h-36 w-36 rounded-lg object-cover shadow transition ${status === 'uploading' ? 'opacity-50 blur-sm' : ''}`}
+                            className="h-36 w-36 rounded-lg object-cover shadow transition"
                         />
-                        {status === 'uploading' && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <svg className="h-8 w-8 animate-spin text-violet-600" viewBox="0 0 24 24" fill="none">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v8H4Z" />
-                                </svg>
-                            </div>
-                        )}
+
                         {status === 'success' && (
                             <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-white shadow">
                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -93,6 +86,9 @@ export function CoverArtUpload({
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onClear();
+                                if (fileInputRef.current) {
+                                    fileInputRef.current.value = '';
+                                }
                             }}
                             aria-label="Remove selected image"
                             className="mt-1 w-full text-center text-xs text-red-500 underline hover:text-red-700"

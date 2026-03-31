@@ -2,6 +2,12 @@
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --animate-progress: progress 2s ease-in-out infinite;
+
+  @keyframes progress {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
 }
 
 @layer base {
