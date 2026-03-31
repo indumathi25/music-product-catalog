@@ -3,11 +3,11 @@ import { ProductFilterParams } from '../types';
 interface ProductFiltersProps {
     filters: ProductFilterParams;
     onFilterChange: (filters: ProductFilterParams) => void;
-    productCount: { loaded: number; filtered: number };
+    productCount: { loaded: number; total: number };
 }
 
 export function ProductFilters({ filters, onFilterChange, productCount }: ProductFiltersProps) {
-    const isFiltered = productCount.loaded !== productCount.filtered;
+    const isFiltered = productCount.loaded < productCount.total;
 
     return (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-6">
@@ -28,9 +28,9 @@ export function ProductFilters({ filters, onFilterChange, productCount }: Produc
                 {/* Product Count Badge */}
                 <span className="shrink-0 text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg whitespace-nowrap">
                     {isFiltered
-                        ? `${productCount.filtered} / ${productCount.loaded}`
-                        : productCount.loaded}
-                    {' '}{productCount.filtered === 1 ? 'product' : 'products'}
+                        ? `${productCount.loaded} / ${productCount.total}`
+                        : productCount.total}
+                    {' '}{productCount.total === 1 ? 'product' : 'products'}
                 </span>
             </div>
         </div>

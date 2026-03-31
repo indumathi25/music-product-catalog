@@ -21,7 +21,9 @@ FUGA is a purpose-built product management system tailored for music companies. 
 
 ### Client Application (Frontend - React)
 - **UI for Product Creation**: User-friendly, accessible interface for entering product details and uploading cover art.
-- **Product List Display**: High-performance grid interface with infinite scrolling, cover art thumbnails, and instant hybrid search.
+- **Product List Display**: High-performance grid interface with infinite scrolling, cover art thumbnails, and synchronized DB-to-UI product counts.
+- **Custom Global Notifications**: Centralized toast notification system for instant feedback on all product actions (Create/Update/Delete).
+- **Hybrid Search Engine**: Zero-latency UI feedback via local cache filtering combined with a background server search for deep catalog discovery.
 
 ---
 
@@ -29,9 +31,9 @@ FUGA is a purpose-built product management system tailored for music companies. 
 
 | Layer | Technology |
 |-------|-----------|
-| **Backend** | Node.js · Express · TypeScript · PostgreSQL · Prisma · Auth0 (JWT) · Zod · AWS SDK 3 · Helmet |
-| **Frontend** | React 19 · React Compiler · Auth0 (PKCE) · Vite 7 · TypeScript · Tailwind CSS v4 · TanStack Query v5 · Image Compression |
-| **Infra** | Docker · Docker Compose (Dev/Prod) · GitHub Actions (CI) |
+| **Backend** | Node.js · Express · TypeScript · PostgreSQL · Prisma · Auth0 (JWT) · Zod · AWS SDK 3 |
+| **Frontend** | React 19 · Redux Toolkit · Auth0 (PKCE) · Vite 7 · TypeScript · Tailwind CSS v4 · TanStack Query v5 |
+| **Infra** | Docker · Docker Compose · GitHub Actions (CI/CD) |
  
 ---
  
@@ -174,7 +176,7 @@ FUGA/
 |----------|-----------|
 | **Auth0 PKCE** | Industry-standard security for Single Page Applications, eliminating the risk of hardcoded secrets and providing seamless OAuth2/OIDC integration. |
 | **Infinite Scroll** | Eliminates pagination latency; uses scroll-triggered data fetching for a modern mobile-first UX. |
-| **Hybrid Search** | Instant UI feedback via client-side filter for loaded items + server-side fallback for large datasets. |
+| **Hybrid Search** | Instant UI feedback via client-side filter for loaded items + background server-side synchronization for the full database. |
 | **Container-Presenter**| Decouples data fetching from UI, making components pure, highly testable, and reusable. |
 | **Defense in Depth** | Multiple security layers (Rate limit → Auth0 JWT → Validation) ensure robust API protection. |
 | **React Compiler** | Automatic memoization reduces manual `useMemo`/`useCallback` overhead while ensuring 60FPS UI. |

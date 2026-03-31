@@ -63,3 +63,19 @@ export interface ProductFilterParams {
     page?: number;
     limit?: number;
 }
+
+export interface ArtistImage {
+    id: string;
+    url: string;
+    width: number | null;
+    height: number | null;
+    mimeType: string | null;
+    sizeBytes: number | null;
+    createdAt: string;
+}
+
+export interface ArtistLibrary {
+    id: string;
+    name: string;
+    images: ArtistImage[];
+}

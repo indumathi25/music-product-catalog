@@ -7,6 +7,7 @@ import {
     ApiListResponse,
     ApiSingleResponse,
     ProductFilterParams,
+    ArtistLibrary,
 } from './types';
 
 export const productsApi = {
@@ -30,8 +31,8 @@ export const productsApi = {
 
     create: async (dto: CreateProductDto, accessToken?: string): Promise<Product> => {
         const response = await apiClient.post<ApiSingleResponse<Product>>(
-            API_PATHS.PRODUCTS.BASE, 
-            dto as unknown as Record<string, unknown>, 
+            API_PATHS.PRODUCTS.BASE,
+            dto as unknown as Record<string, unknown>,
             accessToken
         );
         return response.data;
@@ -48,5 +49,15 @@ export const productsApi = {
 
     delete: async (id: string, accessToken?: string): Promise<void> => {
         await apiClient.delete(API_PATHS.PRODUCTS.BY_ID(id), accessToken);
+    },
+};
+
+export const artistsApi = {
+    searchByName: async (name: string): Promise<ArtistLibrary | null> => {
+        const response = await apiClient.get<ApiSingleResponse<ArtistLibrary | null>>(
+            API_PATHS.ARTISTS.BASE,
+            { name }
+        );
+        return response.data;
     },
 };

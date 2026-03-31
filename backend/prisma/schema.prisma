@@ -38,7 +38,7 @@ model Product {
 model Image {
   id         String   @id @default(uuid())
   product_id String?  // Optional now
-  product    Product? @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product    Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
   artist_id  String?  // New field
   artist     Artist?  @relation(fields: [artist_id], references: [id], onDelete: SetNull)
   url        String

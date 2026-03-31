@@ -21,7 +21,7 @@ export const productRepository = {
                         ],
                     }
                     : {},
-                artistName ? { artist: { name: { equals: artistName, mode: 'insensitive' } } } : {},
+                artistName ? { artist: { name: { contains: artistName, mode: 'insensitive' } } } : {},
             ],
         };
 
@@ -52,7 +52,7 @@ export const productRepository = {
                         ],
                     }
                     : {},
-                artistName ? { artist: { name: { equals: artistName, mode: 'insensitive' } } } : {},
+                artistName ? { artist: { name: { contains: artistName, mode: 'insensitive' } } } : {},
             ],
         };
 

@@ -39,7 +39,6 @@ RUN npm install -g npm@11.11.0
 
 ENV NODE_ENV=production
 
-# Install only production deps
 COPY package*.json ./
 RUN apk add --no-cache openssl libc6-compat
 RUN npm ci --omit=dev
@@ -51,10 +50,8 @@ COPY prisma ./prisma
 COPY src ./src
 COPY src/docs/openapi.yaml ./dist/src/docs/openapi.yaml
 
-# Create uploads dir
 RUN mkdir -p uploads && chown node:node uploads
 
-# Run as non-root user
 USER node
 
 EXPOSE 4000

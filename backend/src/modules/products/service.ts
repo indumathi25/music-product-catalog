@@ -1,7 +1,6 @@
 import { productRepository } from './repository';
 import { AppError } from '../../middlewares/errorHandler';
 import { HttpStatus, ErrorCodes, PAGINATION_CONSTANTS } from '../../constants';
-import { storageService } from '../../lib/storage';
 import { productMapper } from './mapper';
 import { ProductResponse, CreateProductDto, UpdateProductDto, GetAllProductsQuery, PaginatedResponse } from './types';
 
@@ -42,20 +41,6 @@ export const productService = {
         }
 
         const updated = await productRepository.update(id, data);
-
-        // Remove old images only AFTER successful DB update
-        if (data.image && existing.images && existing.images.length > 0) {
-            for (const oldImg of existing.images) {
-                if (oldImg.url !== data.image.url) {
-                    try {
-                        await storageService.deleteFile(oldImg.url);
-                    } catch (err) {
-                        console.error(`Failed to delete old file ${oldImg.url}:`, err);
-                    }
-                }
-            }
-        }
-
         return productMapper.toResponse(updated);
     },
 
@@ -67,16 +52,5 @@ export const productService = {
 
         // 1. Delete DB record first
         await productRepository.delete(id);
-
-        // 2. Cleanup storage second
-        if (existing.images) {
-            for (const img of existing.images) {
-                try {
-                    await storageService.deleteFile(img.url);
-                } catch (err) {
-                    console.error(`Failed to cleanup file ${img.url} after product deletion:`, err);
-                }
-            }
-        }
     },
 };

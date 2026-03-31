@@ -20,7 +20,7 @@ export function ProductListContainer() {
         filters,
         setFilters,
         allProducts,
-        filteredProducts,
+        totalCount,
         isLoading,
         isError,
         error,
@@ -57,10 +57,10 @@ export function ProductListContainer() {
             <ProductFilters
                 filters={filters}
                 onFilterChange={setFilters}
-                productCount={{ loaded: allProducts.length, filtered: filteredProducts.length }}
+                productCount={{ loaded: allProducts.length, total: totalCount }}
             />
 
-            {!filteredProducts.length && !isLoading ? (
+            {!allProducts.length && !isLoading ? (
                 <EmptyState
                     title={hasFilters ? MESSAGES.PRODUCT_LIST.EMPTY_FILTERED : MESSAGES.PRODUCT_LIST.EMPTY_ALL}
                     description={
@@ -82,7 +82,7 @@ export function ProductListContainer() {
                 />
             ) : (
                 <>
-                    <ProductGrid products={filteredProducts} onDelete={handleDeleteRequest} />
+                    <ProductGrid products={allProducts} onDelete={handleDeleteRequest} />
 
                     {/* Intersection Observer Anchor */}
                     <div ref={ref} className="h-10 w-full flex items-center justify-center">

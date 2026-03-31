@@ -3,4 +3,7 @@ export const API_PATHS = {
         BASE: '/api/products',
         BY_ID: (id: string) => `/api/products/${id}`,
     },
+    ARTISTS: {
+        BASE: '/api/artists',
+    },
 } as const;

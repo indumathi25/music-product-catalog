@@ -10,7 +10,7 @@ import { PRODUCT_LIST_LIMIT } from '@/constants';
 
 vi.mock('../hooks/useProducts', () => ({
     useProducts: vi.fn(),
-    PRODUCTS_QUERY_KEY: ['products'],
+    PRODUCTS_QUERY_KEY: ['products', 'list'],
 }));
 
 vi.mock('react-redux', () => ({
@@ -72,26 +72,5 @@ describe('useProductList', () => {
         });
 
         expect(result.current.filters.artistName).toBe('Beatles');
-    });
-
-    it('filters products client-side by artist name', () => {
-        const mockProducts: Product[] = [
-            { id: 'uuid-1', title: 'A', artistName: 'The Beatles', images: [], createdAt: '', updatedAt: '' },
-            { id: 'uuid-2', title: 'B', artistName: 'Rolling Stones', images: [], createdAt: '', updatedAt: '' },
-        ];
-
-        vi.mocked(useProductsMock.useProducts).mockReturnValue({
-            data: { pages: [{ data: mockProducts, total: 2 }], pageParams: [1] },
-        } as unknown as UseInfiniteQueryResult<InfiniteData<ApiListResponse<Product>>, Error>);
-
-        const { result } = renderHook(() => useProductList(), { wrapper });
-
-        act(() => {
-            result.current.setFilters({ limit: PRODUCT_LIST_LIMIT, artistName: 'Beatles' });
-        });
-
-        expect(result.current.allProducts).toHaveLength(2);
-        expect(result.current.filteredProducts).toHaveLength(1);
-        expect(result.current.filteredProducts[0].artistName).toBe('The Beatles');
     });
 });
