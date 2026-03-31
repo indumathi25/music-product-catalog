@@ -37,9 +37,8 @@ model Product {
 
 model Image {
   id         String   @id @default(uuid())
-  product_id String?  // Optional now
-  product    Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  artist_id  String?  // New field
+  products   Product[]
+  artist_id  String?
   artist     Artist?  @relation(fields: [artist_id], references: [id], onDelete: SetNull)
   url        String
   alt_text   String?
@@ -49,7 +48,7 @@ model Image {
   height     Int?
   created_at DateTime @default(now())
 
-  @@index([product_id])
   @@index([artist_id])
+  @@unique([url, artist_id], name: "url_artist_id")
   @@map("images")
 }

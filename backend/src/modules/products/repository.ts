@@ -83,13 +83,21 @@ export const productRepository = {
                 title: data.title,
                 artist: { connect: { id: artist.id } },
                 images: {
-                    create: {
-                        url: data.image.url,
-                        width: data.image.width,
-                        height: data.image.height,
-                        size_bytes: data.image.sizeBytes,
-                        mime_type: data.image.mimeType,
-                        artist: { connect: { id: artist.id } },
+                    connectOrCreate: {
+                        where: {
+                            url_artist_id: {
+                                url: data.image.url,
+                                artist_id: artist.id,
+                            }
+                        },
+                        create: {
+                            url: data.image.url,
+                            width: data.image.width,
+                            height: data.image.height,
+                            size_bytes: data.image.sizeBytes,
+                            mime_type: data.image.mimeType,
+                            artist: { connect: { id: artist.id } },
+                        }
                     }
                 }
             },
@@ -127,14 +135,22 @@ export const productRepository = {
             }
 
             updateData.images = {
-                deleteMany: {}, // For now, replace all images with the new one
-                create: {
-                    url: data.image.url,
-                    width: data.image.width,
-                    height: data.image.height,
-                    size_bytes: data.image.sizeBytes,
-                    mime_type: data.image.mimeType,
-                    artist: artistId ? { connect: { id: artistId } } : undefined,
+                set: [], // Disconnect old images (Many-to-Many)
+                connectOrCreate: {
+                    where: {
+                        url_artist_id: {
+                            url: data.image.url,
+                            artist_id: artistId!,
+                        }
+                    },
+                    create: {
+                        url: data.image.url,
+                        width: data.image.width,
+                        height: data.image.height,
+                        size_bytes: data.image.sizeBytes,
+                        mime_type: data.image.mimeType,
+                        artist: { connect: { id: artistId! } },
+                    }
                 }
             };
         }

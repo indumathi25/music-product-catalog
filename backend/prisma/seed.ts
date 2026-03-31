@@ -56,7 +56,8 @@ const products = [
 async function main() {
     console.log(`Seeding ${products.length} products...`);
 
-    // 1. Clean data
+    // 1. Clean data 
+    await prisma.image.deleteMany();
     await prisma.product.deleteMany();
     await prisma.artist.deleteMany();
 
@@ -74,20 +75,28 @@ async function main() {
                 create: { name: p.artist },
             });
 
-            // 2. Create DB record with the direct LoremFlickr URL
+            // 2. Create DB record with the direct LoremFlickr URL (Deduplicated)
             await prisma.product.create({
                 data: {
                     title: p.name,
                     artist: { connect: { id: artist.id } },
                     images: {
-                        create: {
-                            url: placeholderUrl,
-                            width: 400,
-                            height: 400,
-                            size_bytes: 50000,
-                            mime_type: 'image/jpeg',
-                            alt_text: `Cover art for ${p.name} by ${p.artist}`,
-                            artist: { connect: { id: artist.id } },
+                        connectOrCreate: {
+                            where: {
+                                url_artist_id: {
+                                    url: placeholderUrl,
+                                    artist_id: artist.id,
+                                }
+                            },
+                            create: {
+                                url: placeholderUrl,
+                                width: 400,
+                                height: 400,
+                                size_bytes: 50000,
+                                mime_type: 'image/jpeg',
+                                alt_text: `Cover art for ${p.name} by ${p.artist}`,
+                                artist: { connect: { id: artist.id } },
+                            }
                         }
                     }
                 },
