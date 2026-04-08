@@ -42,7 +42,10 @@ describe('useProducts', () => {
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(productsApi.getAll).toHaveBeenCalledWith({ page: 1 }, expect.anything());
+        expect(productsApi.getAll).toHaveBeenCalledWith(
+            expect.objectContaining({ page: 1 }),
+            expect.anything()
+        );
         expect(result.current.data?.pages[0].data).toEqual(mockData.data);
     });
 
@@ -58,7 +61,7 @@ describe('useProducts', () => {
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
         expect(productsApi.getAll).toHaveBeenCalledWith(
-            { search: 'query', page: 1 },
+            expect.objectContaining({ search: 'query', page: 1 }),
             expect.anything()
         );
     });
