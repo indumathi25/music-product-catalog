@@ -27,7 +27,7 @@ describe('productFormReducer', () => {
     it('SET_FILE stores file and preview', () => {
         const file = new File(['x'], 'cover.jpg', { type: ALLOWED_IMAGE_TYPES[0] });
         const next = productFormReducer(initialFormState, {
-            type: 'SET_FILE_IN_PROGRESS',
+            type: 'SET_FILE_SELECTED',
             file,
             preview: `data:${ALLOWED_IMAGE_TYPES[0]};base64,test`,
         });
