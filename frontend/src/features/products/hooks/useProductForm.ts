@@ -23,17 +23,15 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         if (initialData) {
             dispatch({ type: 'POPULATE', product: initialData });
         }
-    }, [initialData]);
+    }, [initialData, dispatch]);
 
-    // Memory cleanup: revoke blob URL when the component unmounts
     useEffect(() => {
         return () => {
             if (state.preview && state.preview.startsWith('blob:')) {
                 URL.revokeObjectURL(state.preview);
             }
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [state.preview]);
 
     const handleFile = (file: File) => {
         if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
