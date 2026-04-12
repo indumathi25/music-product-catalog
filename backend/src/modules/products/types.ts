@@ -9,7 +9,6 @@ export interface Artist {
 
 export interface Image {
     id: string;
-    product_id: string | null;
     artist_id: string | null;
     url: string;
     alt_text: string | null;

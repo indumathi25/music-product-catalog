@@ -3,9 +3,6 @@ import { ZodType, treeifyError } from 'zod';
 
 type ValidationTarget = 'body' | 'params' | 'query';
 
-/**
- * Middleware for validating requests using Zod schemas.
- */
 export const validate =
     <T>(schema: ZodType<T>, target: ValidationTarget = 'body') =>
         (req: Request, res: Response, next: NextFunction): void => {

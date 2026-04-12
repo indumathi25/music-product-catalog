@@ -11,7 +11,37 @@ FUGA is a purpose-built product management system tailored for music companies. 
 
 ---
 
-## Technical Requirements (Implemented)
+## Technical Requirements Mapping
+
+| Requirement | Implementation | Technical Highlights |
+| :--- | :--- | :--- |
+| **Create Product** | `ProductForm.tsx` with Title, Artist, and Image. | **Deferred S3 Uploads**: Files are only uploaded on form submit to prevent storage orphans. |
+| **Product List** | `ProductGrid.tsx` with high-quality thumbnails. | **GIN Trigram Search**: Sub-millisecond fuzzy search on titles and artists via PostgreSQL. |
+| **CRUD Operations** | Full REST API in `backend/src/modules/products`. | **Survival Mode**: Images survive product deletion as permanent Artist assets. |
+| **Validation** | Zod schemas for all ingress data (API & DB). | **Type-Safe Pipelines**: Shared types across frontend/backend via Prisma. |
+| **Image Upload** | Direct-to-S3 with Pre-signed URLs. | **Client-side Compression**: WebP conversion in-browser to save bandwidth. |
+| **API Docs** | Interactive Swagger documentation. | **Preload Link Headers**: Backend-driven LCP image preloading for core performance. |
+
+---
+
+## 🚀 Key Features
+
+### 1. Artist Image Library (New)
+Artists now build a permanent gallery of their assets.
+- **Asset Reuse**: Select from an artist's prior cover art when creating new products.
+- **Survival Mode**: Deleting a product "detaches" it from the image but **never deletes** the physical file from S3, ensuring data integrity for shared assets.
+
+### 2. High-Performance Discovery
+- **Fuzzy Search**: Implemented `pg_trgm` GIN indexes for fast `ILIKE` searching.
+- **Infinite Scroll**: Scroll-triggered pagination using React Query for smooth catalog browsing.
+- **Zero Layout Shift (CLS)**: Image metadata (width/height) is extracted pre-upload and stored in the DB to reserve UI space instantly.
+
+### 3. Enterprise Security
+- **Auth0 PKCE**: Secure frontend authentication (Public discovery, Private management).
+- **JWT Verification**: Strict backend validation of all state-changing requests.
+- **Rate Limiting**: Global and write-specific limiters to prevent API abuse.
+
+---
 
 ### Service (Backend - Node.js)
 - **CRUD Operations**: Full Create, Read, Update, and Delete operations for managing products and artists.
@@ -129,24 +159,20 @@ The project includes a `Makefile` for streamlined development and environment ma
 ```
 FUGA/
  ├─ backend/
- │   ├─ src/
- │   │   ├─ config/          # Zod env · Security (Helmet/CORS) · Swagger
- │   │   ├─ modules/products/ # Clean architecture: router → controller → service → repository
- │   │   ├─ middlewares/     # auth (Auth0 JWT) · rateLimiter · validate · errorHandler
- │   │   └─ lib/             # Storage service (Local/S3) · Prisma client · Logger
- │   └─ prisma/              # Schema & migrations
+ ├─ src/
+ │   ├─ modules/
+ │   │   ├─ products/  # Product CRUD & Search logic
+ │   │   └─ artists/   # Artist Library lookup & Image Gallery
+ │   ├─ middlewares/   # auth (Auth0 JWT) · rateLimiter · validate · errorHandler
+ │   └─ lib/           # Storage service (S3) · Prisma client · Logger
  ├─ frontend/
- │   └─ src/
- │       ├─ config/          # Centralized Auth0 & Application settings
- │       ├─ components/      # AuthProvider · Navbar · ProtectedRoute
- │       ├─ features/products/
- │       │   ├─ components/  # ProductCard · ProductGrid · ProductForm
- │       │   ├─ containers/  # Domain-specific logic containers
- │       │   ├─ hooks/       # Custom React Query & Infinite Scroll hooks
- │       │   └─ utils/       # Business logic & validation utilities
- │       ├─ store/           # Redux Toolkit setup (global UI state)
- │       └─ lib/             # Hardened apiClient (Bearer Token injection)
- └─ .github/workflows/      # Automated CI/CD pipelines
+ ├─ src/
+ │   ├─ features/products/
+ │   │   ├─ components/ # ArtistLibraryPicker · CoverArtUpload · ProductGrid
+ │   │   ├─ hooks/      # useArtistLibrary · useProductForm · useInfiniteProducts
+ │   │   └─ api.ts      # Products & Artists API clients
+ │   ├─ store/          # Redux Toolkit (UI state management)
+ │   └─ lib/            # apiClient (Interceptors for Auth tokens)
 ```
 
 ---
@@ -162,11 +188,11 @@ FUGA/
 ### Endpoints
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `GET` | `/api/products` | ❌ | Paginated list with search/filters |
-| `GET` | `/api/products/:id` | ❌ | Detailed product view |
-| `POST` | `/api/products` | ✅ | Create new product (Auth0 required) |
-| `PUT` | `/api/products/:id` | ✅ | Update product (Auth0 required) |
-| `DELETE` | `/api/products/:id` | ✅ | Permanently delete product (Auth0 required) |
+| `GET` | `/api/products` | ❌ | Paginated catalog with Search/Filter |
+| `GET` | `/api/artists` | ❌ | Artist Library & Image Gallery lookup |
+| `POST` | `/api/products` | ✅ | Create product (Deferred S3 upload) |
+| `PUT` | `/api/products/:id` | ✅ | Update product (Asset persistence) |
+| `DELETE` | `/api/products/:id` | ✅ | Delete product (Survival Mode) |
 
 ---
 
@@ -174,15 +200,11 @@ FUGA/
 
 | Decision | Rationale |
 |----------|-----------|
-| **Auth0 PKCE** | Industry-standard security for Single Page Applications, eliminating the risk of hardcoded secrets and providing seamless OAuth2/OIDC integration. |
+| **Survival Mode (SetNull)**| Switched from Cascade Delete to SetNull on product images. This treats images as permanent Artist assets, allowing them to survive product deletion and be safely reused across the catalog without storage fragmentation or broken links. |
+| **GIN Trigram Search**| Implemented PostgreSQL `pg_trgm` indexes. This solves the "Full Table Scan" limitation of standard B-Tree indexes when performing fuzzy searches (`ILIKE %term%`) on large datasets. |
+| **Auth0 PKCE** | Industry-standard security for SPAs, eliminating the risk of hardcoded secrets and providing seamless OAuth2/OIDC integration. |
 | **Infinite Scroll** | Eliminates pagination latency; uses scroll-triggered data fetching for a modern mobile-first UX. |
-| **Hybrid Search** | Instant UI feedback via client-side filter for loaded items + background server-side synchronization for the full database. |
-| **Container-Presenter**| Decouples data fetching from UI, making components pure, highly testable, and reusable. |
-| **Defense in Depth** | Multiple security layers (Rate limit → Auth0 JWT → Validation) ensure robust API protection. |
-| **React Compiler** | Automatic memoization reduces manual `useMemo`/`useCallback` overhead while ensuring 60FPS UI. |
-| **Relational Metadata**| Moving from a flat URL to an `Image` model allows the UI to reserve space (Width/Height) accurately, eliminating Layout Shift. |
-| **Shimmer UI (Skeleton)**| Implements pure-CSS native `animate-pulse` and `opacity` transitions while images load dynamically over the network, providing instant, premium perceived performance during infinite scrolling. |
-| **Optimistic Direct Uploads** | Client-side image compression (`browser-image-compression`) combined with S3 Presigned URLs shifts compute costs to the browser, eliminating the need for expensive AWS Lambda triggers or heavy Node.js memory buffers. |
+| **Optimistic Direct Uploads** | Client-side compression combined with S3 Presigned URLs shifts compute costs to the browser, eliminating the need for heavy Node.js memory buffers. |
 
 ---
 
@@ -193,10 +215,3 @@ Fully automated CI pipeline on every push:
 - **Production Build Validation**
 - **Docker Image Build Verification**
 
----
-
-## Future Enhancements & Architectural Trade-offs
-
-### 1. Multi-Artist Collaborations & Secondary Assets
-- **Implementation**: The current schema links images directly to artists.
-- **Enhancement**: Scaling this to support multi-artist tracks and "Artist Libraries" where common brand assets (logos, profile banners) can be managed once and reused across hundreds of products.

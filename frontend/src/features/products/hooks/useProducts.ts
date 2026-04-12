@@ -5,7 +5,6 @@ import { QUERY_KEYS, PRODUCT_LIST_LIMIT } from '../../../constants';
 
 export const PRODUCTS_QUERY_KEY = QUERY_KEYS.PRODUCTS_LIST;
 
-/** Strip falsy values so {search: '', artistName: ''} and {} produce the same cache key */
 function normalizeParams(params: Record<string, unknown>): Record<string, unknown> {
     return Object.fromEntries(
         Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')

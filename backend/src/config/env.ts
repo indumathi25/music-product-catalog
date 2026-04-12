@@ -6,7 +6,6 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
     CORS_ORIGIN: z.string().default('http://localhost:5173'),
-    MAX_FILE_SIZE_MB: z.string().default('5').transform(Number),
     STORAGE_PROVIDER: z.enum(['local', 's3']).default('local'),
     S3_BUCKET: z.string().optional(),
     S3_REGION: z.string().optional(),
@@ -19,7 +18,7 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-    console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors);
+    console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
     process.exit(1);
 }
 

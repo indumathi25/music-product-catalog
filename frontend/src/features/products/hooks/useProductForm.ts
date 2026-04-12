@@ -1,115 +1,155 @@
-import { useReducer, useEffect, type SubmitEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
 import { useAuth0 } from '@auth0/auth0-react';
 import { processAndUploadImage } from '../utils/uploadImage';
-import {
-    productFormReducer,
-    initialFormState,
-    ProductFormState,
-} from '../reducers/productFormReducer';
-import { validateForm } from '../utils/validation';
 import { Product, ArtistImage } from '../types';
-import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE_BYTES } from '@/constants';
+
+export interface ProductFormValues {
+    title: string;
+    artistName: string;
+    file: File | null;
+    imageMetadata: {
+        url: string;
+        width: number;
+        height: number;
+        sizeBytes: number;
+        mimeType: string;
+    } | null;
+}
 
 interface UseProductFormOptions {
-    onSubmit: (state: ProductFormState) => Promise<void>;
+    onSubmit: (data: ProductFormValues) => Promise<void>;
     initialData?: Product;
 }
 
+export type UploadStatus = 'idle' | 'selected' | 'uploading' | 'success' | 'error';
+
 export function useProductForm({ onSubmit, initialData }: UseProductFormOptions) {
-    const [state, dispatch] = useReducer(productFormReducer, initialFormState);
     const { getAccessTokenSilently } = useAuth0();
+    
+    const initialImageUrl = useMemo(() => initialData?.images[0]?.url || null, [initialData]);
+
+    const [uploadStatus, setUploadStatus] = useState<UploadStatus>(initialImageUrl ? 'success' : 'idle');
+    const [preview, setPreview] = useState<string | null>(initialImageUrl);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit: rhfHandleSubmit,
+        setValue,
+        watch,
+        reset,
+        control, 
+        formState: { errors, isSubmitting, isDirty: rhfIsDirty },
+    } = useForm<ProductFormValues>({
+        defaultValues: {
+            title: initialData?.title || '',
+            artistName: initialData?.artistName || '',
+            file: null,
+            imageMetadata: initialData?.images[0] ? {
+                url: initialData.images[0].url,
+                width: initialData.images[0].width || 0,
+                height: initialData.images[0].height || 0,
+                sizeBytes: initialData.images[0].sizeBytes || 0,
+                mimeType: initialData.images[0].mimeType || 'image/webp'
+            } : null,
+        },
+    });
+
+    // eslint-disable-next-line react-hooks/incompatible-library
+    const values = watch();
+
+    const revokePreview = useCallback(() => {
+        if (preview?.startsWith('blob:')) {
+            URL.revokeObjectURL(preview);
+        }
+    }, [preview]);
 
     useEffect(() => {
-        if (initialData) {
-            dispatch({ type: 'POPULATE', product: initialData });
-        }
-    }, [initialData]);
+        return () => revokePreview();
+    }, [revokePreview]);
 
-    // Memory cleanup: revoke blob URL when the component unmounts
-    useEffect(() => {
-        return () => {
-            if (state.preview && state.preview.startsWith('blob:')) {
-                URL.revokeObjectURL(state.preview);
-            }
-        };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    const handleFile = useCallback((file: File) => {
+        revokePreview(); 
+        const previewUrl = URL.createObjectURL(file);
+        setPreview(previewUrl);
+        setUploadStatus('selected');
+        setUploadError(null);
 
-    const handleFile = (file: File) => {
-        if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
-            dispatch({
-                type: 'SET_ERRORS',
-                errors: { file: 'Only JPEG, PNG, and WebP images are allowed' },
-            });
-            return;
-        }
-        if (file.size > MAX_FILE_SIZE_BYTES) {
-            dispatch({ type: 'SET_ERRORS', errors: { file: 'Image must be under 5 MB' } });
-            return;
-        }
+        setValue('file', file, { shouldDirty: true });
+        setValue('imageMetadata', null, { shouldDirty: true });
+    }, [setValue, revokePreview]);
 
-        // Instantly show the preview — no upload yet
-        const preview = URL.createObjectURL(file);
-        dispatch({ type: 'SET_FILE_SELECTED', file, preview });
-    };
+    const handleClearFile = useCallback(() => {
+        revokePreview();
+        setPreview(null);
+        setUploadStatus('idle');
+        setUploadError(null);
+        setValue('file', null, { shouldDirty: true });
+        setValue('imageMetadata', null, { shouldDirty: true });
+    }, [setValue, revokePreview]);
 
-    const handleRetryUpload = () => {
-        // Retry is now handled inside handleSubmit — no separate upload step needed
-    };
+    const handleSelectFromLibrary = useCallback((image: ArtistImage) => {
+        revokePreview();
+        setPreview(image.url);
+        setUploadStatus('success');
+        setUploadError(null);
+        setValue('file', null, { shouldDirty: true });
+        setValue('imageMetadata', {
+            url: image.url,
+            width: image.width ?? 0,
+            height: image.height ?? 0,
+            sizeBytes: image.sizeBytes ?? 0,
+            mimeType: image.mimeType ?? 'image/webp',
+        }, { shouldDirty: true });
+    }, [setValue, revokePreview]);
 
-    const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const isUpdate = !!initialData;
-        const errors = validateForm(state);
-        if (Object.keys(errors).length > 0) {
-            dispatch({ type: 'SET_ERRORS', errors });
-            return;
-        }
-        dispatch({ type: 'SET_SUBMITTING', value: true });
-
+    const onSubmitHandler = async (data: ProductFormValues) => {
         try {
-            let submittableState = state;
+            let metadata = data.imageMetadata;
 
-            // Option B: Only upload if we don't already have S3 metadata from a previous attempt
-            if (!state.imageMetadata && state.file) {
-                dispatch({ type: 'SET_FILE_IN_PROGRESS' });
+            if (data.file && !metadata) {
+                setUploadStatus('uploading');
                 const token = await getAccessTokenSilently();
-                const imageMetadata = await processAndUploadImage(state.file, token);
-                dispatch({ type: 'SET_FILE_SUCCESS', metadata: imageMetadata });
-                submittableState = { ...state, imageMetadata };
+                metadata = await processAndUploadImage(data.file, token);
+                
+                setUploadStatus('success');
+                setValue('imageMetadata', metadata); 
             }
 
-            await onSubmit(submittableState);
-            if (!isUpdate) {
-                dispatch({ type: 'RESET' });
+            await onSubmit({ ...data, imageMetadata: metadata });
+            
+            if (!initialData) {
+                revokePreview();
+                reset();
+                setPreview(null);
+                setUploadStatus('idle');
             }
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
-            dispatch({ type: 'SET_FILE_ERROR', error: errorMessage });
-        } finally {
-            dispatch({ type: 'SET_SUBMITTING', value: false });
+            setUploadError(error instanceof Error ? error.message : 'Upload failed');
+            setUploadStatus('error');
+            console.error('[ProductForm] Submission Error:', error);
+            throw error;
         }
     };
 
-    const handleFieldChange = (field: 'title' | 'artistName', value: string) => {
-        dispatch({ type: 'SET_FIELD', field, value });
-    };
-
-    const handleClearFile = () => {
-        dispatch({ type: 'CLEAR_FILE' });
-    };
-
-    const handleSelectFromLibrary = (image: ArtistImage) => {
-        dispatch({ type: 'SELECT_FROM_LIBRARY', image });
-    };
+    const isDirty = useMemo(() => 
+        rhfIsDirty || preview !== initialImageUrl, 
+    [rhfIsDirty, preview, initialImageUrl]);
 
     return {
-        state,
+        register,
+        control, 
+        handleSubmit: rhfHandleSubmit(onSubmitHandler),
         handleFile,
-        handleSubmit,
-        handleRetryUpload,
-        handleFieldChange,
         handleClearFile,
         handleSelectFromLibrary,
+        values,
+        errors,
+        isSubmitting,
+        isDirty,
+        preview,
+        uploadStatus,
+        uploadError,
     };
 }

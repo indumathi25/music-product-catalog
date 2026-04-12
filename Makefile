@@ -1,43 +1,34 @@
 .PHONY: up down restart logs db-migrate db-deploy db-seed test lint clean
 
-# Commands
-COMPOSE := docker compose
-BACKEND := $(COMPOSE) exec backend
-NPM     := npm --prefix
-
-# --- Docker Lifecycle ---
 up:
-	$(COMPOSE) up --build -d
+	docker compose up --build -d
 
 down:
-	$(COMPOSE) down
+	docker compose down
 
 restart:
-	$(COMPOSE) restart
+	docker compose restart
 
 logs:
-	$(COMPOSE) logs -f
+	docker compose logs -f
 
-# --- Database ---
 db-migrate:
-	$(BACKEND) npx prisma migrate dev 
+	docker compose exec backend npx prisma migrate dev 
 
 db-deploy:
-	$(BACKEND) npx prisma migrate deploy
+	docker compose exec backend npx prisma migrate deploy
 
 db-seed:
-	$(BACKEND) npx tsx prisma/seed.ts
+	docker compose exec backend npx tsx prisma/seed.ts
 
-# --- Quality ---
 test:
-	$(NPM) backend test
-	$(NPM) frontend test
+	cd backend && npm test
+	cd frontend && npm test
 
 lint:
-	$(NPM) backend run lint
-	$(NPM) frontend run lint
+	cd backend && npm run lint
+	cd frontend && npm run lint
 
-# --- Cleanup ---
 clean:
-	$(COMPOSE) down -v --remove-orphans
+	docker compose down -v --remove-orphans
 	docker image prune -f
