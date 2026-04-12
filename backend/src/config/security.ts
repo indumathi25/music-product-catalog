@@ -3,12 +3,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { env } from './env';
 
-/**
- * Helmet configuration for standard security headers.
- * Includes a hardened Content Security Policy (CSP).
- */
 export const securityMiddleware = helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Essential for serving images
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
@@ -27,7 +23,7 @@ export const securityMiddleware = helmet({
                 "cdn.auth0.com",
             ],
             connectSrc: ["'self'", "*.amazonaws.com", "*.auth0.com"],
-            frameAncestors: ["'none'"], // Prevent clickjacking
+            frameAncestors: ["'none'"],
         },
     },
     hsts: {
@@ -37,9 +33,6 @@ export const securityMiddleware = helmet({
     },
 });
 
-/**
- * CORS configuration for cross-origin requests.
- */
 export const corsMiddleware = cors({
     origin: env.CORS_ORIGIN,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -47,9 +40,6 @@ export const corsMiddleware = cors({
     credentials: true,
 });
 
-/**
- * Custom explicit security headers.
- */
 export const explicitSecurityHeaders = (_req: Request, res: Response, next: NextFunction) => {
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-Content-Type-Options', 'nosniff');

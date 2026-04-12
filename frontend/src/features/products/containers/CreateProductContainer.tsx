@@ -1,18 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { ProductForm } from '../components/ProductForm';
-import { ProductFormState } from '../reducers/productFormReducer';
+import { ProductFormValues } from '../hooks/useProductForm';
 
 
 export function CreateProductContainer() {
     const navigate = useNavigate();
     const createMutation = useCreateProduct();
 
-    const handleSubmit = async (state: ProductFormState) => {
+    const handleSubmit = async (values: ProductFormValues) => {
         await createMutation.mutateAsync({
-            title: state.title,
-            artistName: state.artistName,
-            image: state.imageMetadata!,
+            title: values.title,
+            artistName: values.artistName,
+            image: values.imageMetadata!,
         });
         navigate('/');
     };
