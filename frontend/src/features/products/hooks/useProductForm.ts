@@ -56,7 +56,8 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
         },
     });
 
-    const values = watch(); 
+    // eslint-disable-next-line react-hooks/incompatible-library
+    const values = watch();
 
     const revokePreview = useCallback(() => {
         if (preview?.startsWith('blob:')) {
@@ -105,19 +106,18 @@ export function useProductForm({ onSubmit, initialData }: UseProductFormOptions)
 
     const onSubmitHandler = async (data: ProductFormValues) => {
         try {
-            let finalData = { ...data };
+            let metadata = data.imageMetadata;
 
-            if (data.file && !data.imageMetadata) {
+            if (data.file && !metadata) {
                 setUploadStatus('uploading');
                 const token = await getAccessTokenSilently();
-                const metadata = await processAndUploadImage(data.file, token);
+                metadata = await processAndUploadImage(data.file, token);
                 
                 setUploadStatus('success');
                 setValue('imageMetadata', metadata); 
-                finalData.imageMetadata = metadata; 
             }
 
-            await onSubmit(finalData);
+            await onSubmit({ ...data, imageMetadata: metadata });
             
             if (!initialData) {
                 revokePreview();
