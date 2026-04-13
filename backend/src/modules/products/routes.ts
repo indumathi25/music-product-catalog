@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { productController } from './controller';
 import { validate } from '../../middlewares/validate';
 import { createProductSchema, updateProductSchema, productIdSchema, uploadUrlSchema } from './schema';
-
 import { authMiddleware } from '../../middlewares/auth';
 import { writeLimiter } from '../../middlewares/rateLimiter';
 

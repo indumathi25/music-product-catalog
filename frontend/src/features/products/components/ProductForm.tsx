@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
 import { useProductForm, ProductFormValues } from '../hooks/useProductForm';
 import { Product } from '../types';
 import { useArtistLibrary } from '../hooks/useArtistLibrary';
+import { useArtists } from '../../artists/hooks/useArtists';
 import { FormInput } from './FormInput';
+import { FormSelect } from './FormSelect';
 import { CoverArtUpload } from './CoverArtUpload';
 import { ArtistLibraryPicker } from './ArtistLibraryPicker';
 
@@ -38,6 +41,11 @@ export function ProductForm({
         initialData,
     });
 
+    const { data: artists, isLoading: isArtistsLoading } = useArtists();
+    const artistOptions = useMemo(() => 
+        artists?.map(a => ({ value: a.name, label: a.name })) ?? []
+    , [artists]);
+
     const { libraryImages } = useArtistLibrary(values.artistName);
 
     const otherLibraryImages = libraryImages.filter(img => img.url !== preview);
@@ -52,11 +60,13 @@ export function ProductForm({
                 {...register('title', { required: 'Product title is required' })}
             />
 
-            <FormInput
+            <FormSelect
                 id="artist-name"
                 label="Artist Name"
                 error={errors.artistName?.message}
-                placeholder="e.g. The Beatles"
+                placeholder={isArtistsLoading ? 'Loading artists...' : 'Select an artist'}
+                options={artistOptions}
+                disabled={isArtistsLoading}
                 {...register('artistName', { required: 'Artist name is required' })}
             />
 

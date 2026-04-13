@@ -1,34 +1,33 @@
-// Generator: prisma-client-js
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
-}
-
 model Artist {
   id         String    @id @default(uuid())
   name       String    @unique
-  products   Product[]
-  images     Image[]   // New direct relation
   created_at DateTime  @default(now())
+  images     Image[]
+  products   Product[]
 
   @@map("artists")
 }
 
 model Product {
-  id             String   @id @default(uuid())
-  artist_id      String
-  artist         Artist   @relation(fields: [artist_id], references: [id], onDelete: Cascade)
-  title          String
-  images         Image[]
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id         String   @id @default(uuid())
+  artist_id  String
+  title      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  artist     Artist   @relation(fields: [artist_id], references: [id], onDelete: Cascade)
+  images     Image[]  @relation("ImageToProduct")
 
+  @@unique([title, artist_id])
   @@index([artist_id])
   @@index([title])
   @@index([created_at])
@@ -36,19 +35,19 @@ model Product {
 }
 
 model Image {
-  id         String   @id @default(uuid())
-  products   Product[]
+  id         String    @id @default(uuid())
   artist_id  String?
-  artist     Artist?  @relation(fields: [artist_id], references: [id], onDelete: SetNull)
   url        String
   alt_text   String?
   mime_type  String?
   size_bytes Int?
   width      Int?
   height     Int?
-  created_at DateTime @default(now())
+  created_at DateTime  @default(now())
+  artist     Artist?   @relation(fields: [artist_id], references: [id])
+  products   Product[] @relation("ImageToProduct")
 
-  @@index([artist_id])
   @@unique([url, artist_id], name: "url_artist_id")
+  @@index([artist_id])
   @@map("images")
 }

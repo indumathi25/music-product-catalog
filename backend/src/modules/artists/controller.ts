@@ -17,4 +17,13 @@ export const artistController = {
             next(err);
         }
     },
+
+    getAll: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const artists = await artistRepository.findAll();
+            res.json({ data: artists });
+        } catch (err) {
+            next(err);
+        }
+    },
 };

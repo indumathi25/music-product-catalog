@@ -8,6 +8,7 @@ import {
     ApiSingleResponse,
     ProductFilterParams,
     ArtistLibrary,
+    Artist,
 } from './types';
 
 export const productsApi = {
@@ -53,9 +54,18 @@ export const productsApi = {
 };
 
 export const artistsApi = {
+    getAll: async (signal?: AbortSignal): Promise<Artist[]> => {
+        const response = await apiClient.get<ApiSingleResponse<Artist[]>>(
+            API_PATHS.ARTISTS.BASE,
+            undefined,
+            signal
+        );
+        return response.data;
+    },
+
     searchByName: async (name: string): Promise<ArtistLibrary | null> => {
         const response = await apiClient.get<ApiSingleResponse<ArtistLibrary | null>>(
-            API_PATHS.ARTISTS.BASE,
+            `${API_PATHS.ARTISTS.BASE}/search`,
             { name }
         );
         return response.data;

@@ -72,40 +72,49 @@ export const productRepository = {
     },
 
     create: async (data: CreateProductDto): Promise<Product> => {
-        const artist = await prisma.artist.upsert({
+        const artist = await prisma.artist.findUnique({
             where: { name: data.artistName },
-            update: {},
-            create: { name: data.artistName },
         });
 
-        return prisma.product.create({
-            data: {
-                title: data.title,
-                artist: { connect: { id: artist.id } },
-                images: {
-                    connectOrCreate: {
-                        where: {
-                            url_artist_id: {
+        if (!artist) {
+            throw new Error('ARTIST_NOT_FOUND');
+        }
+
+        try {
+            return (await prisma.product.create({
+                data: {
+                    title: data.title,
+                    artist: { connect: { id: artist.id } },
+                    images: {
+                        connectOrCreate: {
+                            where: {
+                                url_artist_id: {
+                                    url: data.image.url,
+                                    artist_id: artist.id,
+                                }
+                            },
+                            create: {
                                 url: data.image.url,
-                                artist_id: artist.id,
+                                width: data.image.width,
+                                height: data.image.height,
+                                size_bytes: data.image.sizeBytes,
+                                mime_type: data.image.mimeType,
+                                artist: { connect: { id: artist.id } },
                             }
-                        },
-                        create: {
-                            url: data.image.url,
-                            width: data.image.width,
-                            height: data.image.height,
-                            size_bytes: data.image.sizeBytes,
-                            mime_type: data.image.mimeType,
-                            artist: { connect: { id: artist.id } },
                         }
                     }
-                }
-            },
-            include: {
-                artist: true,
-                images: true
-            },
-        }) as unknown as Product;
+                },
+                include: {
+                    artist: true,
+                    images: true
+                },
+            })) as unknown as Product;
+        } catch (err) {
+            if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+                throw new Error('PRODUCT_ALREADY_EXISTS');
+            }
+            throw err;
+        }
     },
 
     update: async (id: string, data: UpdateProductDto): Promise<Product> => {
@@ -115,11 +124,14 @@ export const productRepository = {
 
         let artistId: string | undefined;
         if (data.artistName !== undefined) {
-            const artist = await prisma.artist.upsert({
+            const artist = await prisma.artist.findUnique({
                 where: { name: data.artistName },
-                update: {},
-                create: { name: data.artistName },
             });
+
+            if (!artist) {
+                throw new Error('ARTIST_NOT_FOUND');
+            }
+
             artistId = artist.id;
             updateData.artist = { connect: { id: artistId } };
         }
@@ -155,14 +167,21 @@ export const productRepository = {
             };
         }
 
-        return prisma.product.update({
-            where: { id },
-            data: updateData,
-            include: {
-                artist: true,
-                images: true
-            },
-        }) as unknown as Product;
+        try {
+            return (await prisma.product.update({
+                where: { id },
+                data: updateData,
+                include: {
+                    artist: true,
+                    images: true
+                },
+            })) as unknown as Product;
+        } catch (err) {
+            if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+                throw new Error('PRODUCT_ALREADY_EXISTS');
+            }
+            throw err;
+        }
     },
 
     delete: async (id: string): Promise<Product> => {

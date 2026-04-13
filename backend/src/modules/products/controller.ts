@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { productService } from './service';
 import { CreateProductInput, UpdateProductInput, ProductIdParam } from './schema';
+import { AppError } from '../../middlewares/errorHandler';
 
 import { storageService } from '../../lib/storage';
 
@@ -35,7 +36,6 @@ export const productController = {
             const { id } = req.params as unknown as ProductIdParam;
             const product = await productService.getById(id);
 
-            // Preload the main image for the detail view
             const mainImage = product.images[0];
             if (mainImage) {
                 res.setHeader('Link', `<${mainImage.url}>; rel=preload; as=image; fetchpriority=high; crossorigin`);
@@ -67,6 +67,14 @@ export const productController = {
             });
             res.status(201).json({ data: product });
         } catch (err) {
+            if (err instanceof Error) {
+                if (err.message === 'ARTIST_NOT_FOUND') {
+                    return next(new AppError(400, 'ARTIST_NOT_FOUND', 'The specified artist does not exist. Please select a valid artist.'));
+                }
+                if (err.message === 'PRODUCT_ALREADY_EXISTS') {
+                    return next(new AppError(409, 'PRODUCT_ALREADY_EXISTS', 'This artist already has a product with this title.'));
+                }
+            }
             next(err);
         }
     },
@@ -82,6 +90,14 @@ export const productController = {
             });
             res.json({ data: product });
         } catch (err) {
+            if (err instanceof Error) {
+                if (err.message === 'ARTIST_NOT_FOUND') {
+                    return next(new AppError(400, 'ARTIST_NOT_FOUND', 'The specified artist does not exist. Please select a valid artist.'));
+                }
+                if (err.message === 'PRODUCT_ALREADY_EXISTS') {
+                    return next(new AppError(409, 'PRODUCT_ALREADY_EXISTS', 'This artist already has a product with this title.'));
+                }
+            }
             next(err);
         }
     },
