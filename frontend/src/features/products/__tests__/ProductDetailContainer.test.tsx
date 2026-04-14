@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { TestWrapper } from '../../../test/TestWrapper';
 import { ProductDetailContainer } from '../containers/ProductDetailContainer';
 import * as useProductMock from '../hooks/useProduct';
 import * as useUpdateProductMock from '../hooks/useUpdateProduct';
@@ -8,9 +9,13 @@ import { Product } from '../types';
 
 const mockDispatch = vi.fn();
 
-vi.mock('react-redux', () => ({
-    useDispatch: () => mockDispatch,
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useDispatch: () => mockDispatch,
+    };
+});
 
 vi.mock('@auth0/auth0-react', () => ({
     useAuth0: () => ({
@@ -26,6 +31,20 @@ vi.mock('../hooks/useProduct', () => ({
 
 vi.mock('../hooks/useUpdateProduct', () => ({
     useUpdateProduct: vi.fn(),
+}));
+
+vi.mock('../../artists/hooks/useArtists', () => ({
+    useArtists: () => ({
+        data: [{ id: 'artist-1', name: 'Test Artist' }, { id: 'artist-2', name: 'New Artist' }],
+        isLoading: false,
+    }),
+}));
+
+vi.mock('../hooks/useArtistLibrary', () => ({
+    useArtistLibrary: () => ({
+        libraryImages: [],
+        isLibraryLoading: false,
+    }),
 }));
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
@@ -102,11 +121,11 @@ describe('ProductDetailContainer', () => {
 
     const renderComponent = () => {
         return render(
-            <MemoryRouter initialEntries={[`/product/${VALID_UUID}`]}>
+            <TestWrapper initialEntries={[`/product/${VALID_UUID}`]}>
                 <Routes>
                     <Route path="/product/:id" element={<ProductDetailContainer />} />
                 </Routes>
-            </MemoryRouter>
+            </TestWrapper>
         );
     };
 
@@ -139,7 +158,9 @@ describe('ProductDetailContainer', () => {
         fireEvent.change(screen.getByLabelText(/Product Title/i), { target: { value: 'Updated Song' } });
 
         // Save
-        fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
+        const saveButton = screen.getByRole('button', { name: /Save Changes/i });
+        await waitFor(() => expect(saveButton).not.toBeDisabled());
+        fireEvent.submit(screen.getByRole('form', { name: /Product form/i }));
 
         await waitFor(() => {
             expect(mockUpdateMutateAsync).toHaveBeenCalledWith(

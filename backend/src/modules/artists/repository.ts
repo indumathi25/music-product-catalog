@@ -32,4 +32,16 @@ export const artistRepository = {
             })),
         };
     },
+
+    findAll: async (): Promise<{ id: string; name: string }[]> => {
+        return prisma.artist.findMany({
+            select: {
+                id: true,
+                name: true,
+            },
+            orderBy: {
+                name: 'asc',
+            },
+        });
+    },
 };

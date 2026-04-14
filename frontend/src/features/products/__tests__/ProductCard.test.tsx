@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestWrapper } from '../../../test/TestWrapper';
 import { ProductCard } from '../components/ProductCard';
 import { Product } from '../types';
 
@@ -26,9 +26,9 @@ const mockProduct: Product = {
 describe('ProductCard', () => {
     it('renders product title and artist name', () => {
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductCard product={mockProduct} onDelete={vi.fn()} />
-            </MemoryRouter>
+            </TestWrapper>
         );
         expect(screen.getByText('Abbey Road')).toBeDefined();
         expect(screen.getByText('The Beatles')).toBeDefined();
@@ -36,9 +36,9 @@ describe('ProductCard', () => {
 
     it('renders cover art with accessible alt text', () => {
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductCard product={mockProduct} onDelete={vi.fn()} />
-            </MemoryRouter>
+            </TestWrapper>
         );
         const img = screen.getByRole('img');
         expect(img.getAttribute('alt')).toContain('Abbey Road');
@@ -47,9 +47,9 @@ describe('ProductCard', () => {
 
     it('has correct aria-label on the article', () => {
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductCard product={mockProduct} onDelete={vi.fn()} />
-            </MemoryRouter>
+            </TestWrapper>
         );
         const article = screen.getByRole('article');
         expect(article.getAttribute('aria-label')).toBe('Abbey Road by The Beatles');

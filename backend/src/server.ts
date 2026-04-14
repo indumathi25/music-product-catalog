@@ -5,8 +5,8 @@ import { logger } from './lib/logger';
 import { prisma } from './lib/prisma';
 
 const server = app.listen(env.PORT, () => {
-    logger.info(`🚀 Server running on http://localhost:${env.PORT}`);
-    logger.info(`📚 API docs: http://localhost:${env.PORT}/api-docs`);
+    logger.info(`Server running on http://localhost:${env.PORT}`);
+    logger.info(`API docs: http://localhost:${env.PORT}/api-docs`);
 });
 
 const shutdown = async (): Promise<void> => {

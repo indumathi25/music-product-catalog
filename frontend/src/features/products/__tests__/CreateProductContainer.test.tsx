@@ -1,15 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestWrapper } from '../../../test/TestWrapper';
 import { CreateProductContainer } from '../containers/CreateProductContainer';
 import * as useCreateProductMock from '../hooks/useCreateProduct';
 import * as uploadImageMock from '../utils/uploadImage';
 
 const mockDispatch = vi.fn();
 
-vi.mock('react-redux', () => ({
-    useDispatch: () => mockDispatch,
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useDispatch: () => mockDispatch,
+    };
+});
 
 vi.mock('@auth0/auth0-react', () => ({
     useAuth0: () => ({
@@ -26,6 +30,20 @@ vi.mock('../hooks/useCreateProduct', () => ({
 
 vi.mock('../utils/uploadImage', () => ({
     processAndUploadImage: vi.fn(),
+}));
+
+vi.mock('../../artists/hooks/useArtists', () => ({
+    useArtists: () => ({
+        data: [{ id: 'artist-1', name: 'Test Artist' }, { id: 'artist-2', name: 'New Artist' }],
+        isLoading: false,
+    }),
+}));
+
+vi.mock('../hooks/useArtistLibrary', () => ({
+    useArtistLibrary: () => ({
+        libraryImages: [],
+        isLibraryLoading: false,
+    }),
 }));
 
 describe('CreateProductContainer', () => {
@@ -55,9 +73,9 @@ describe('CreateProductContainer', () => {
 
     it('renders the create product form', () => {
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <CreateProductContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByRole('button', { name: /create product/i })).toBeDefined();
@@ -75,9 +93,9 @@ describe('CreateProductContainer', () => {
         vi.mocked(uploadImageMock.processAndUploadImage).mockResolvedValue(mockImageMetadata);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <CreateProductContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         // Fill out required fields
@@ -91,7 +109,8 @@ describe('CreateProductContainer', () => {
 
         // Wait for upload to complete and button to be ready
         const submitButton = await screen.findByRole('button', { name: /create product/i });
-        fireEvent.click(submitButton);
+        await waitFor(() => expect(submitButton).not.toBeDisabled());
+        fireEvent.submit(screen.getByRole('form', { name: /Product form/i }));
 
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith(expect.objectContaining({
@@ -123,9 +142,9 @@ describe('CreateProductContainer', () => {
         } as unknown as ReturnType<typeof useCreateProductMock.useCreateProduct>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <CreateProductContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByRole('button', { name: /saving/i })).toBeDefined();

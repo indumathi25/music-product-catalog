@@ -79,3 +79,8 @@ export interface ArtistLibrary {
     name: string;
     images: ArtistImage[];
 }
+
+export interface Artist {
+    id: string;
+    name: string;
+}

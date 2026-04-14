@@ -21,8 +21,5 @@ export function useUpdateProduct() {
             queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
             dispatch(addToast({ message: UI_CONSTANTS.TOAST_MESSAGES.PRODUCT_UPDATE_SUCCESS, type: 'success' }));
         },
-        onError: (error: Error) => {
-            dispatch(addToast({ message: error.message || 'Failed to update product', type: 'error' }));
-        },
     });
 }

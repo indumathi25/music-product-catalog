@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createTestWrapper } from '../../../test/TestWrapper';
 import { useProductList } from '../hooks/useProductList';
 import * as useProductsMock from '../hooks/useProducts';
 import { Product, ApiListResponse } from '../types';
@@ -13,16 +13,17 @@ vi.mock('../hooks/useProducts', () => ({
     PRODUCTS_QUERY_KEY: ['products', 'list'],
 }));
 
-vi.mock('react-redux', () => ({
-    useSelector: vi.fn(),
-}));
-
-const queryClient = new QueryClient();
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-);
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useSelector: vi.fn(),
+    };
+});
 
 describe('useProductList', () => {
+    const wrapper = createTestWrapper();
+
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(useSelector).mockReturnValue('');
