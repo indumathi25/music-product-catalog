@@ -21,8 +21,5 @@ export function useDeleteProduct() {
             queryClient.invalidateQueries({ queryKey: [...PRODUCT_QUERY_KEY, id] });
             dispatch(addToast({ message: 'Product deleted successfully', type: 'success' }));
         },
-        onError: (error: Error) => {
-            dispatch(addToast({ message: error.message || 'Failed to delete product', type: 'error' }));
-        },
     });
 }

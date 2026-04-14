@@ -11,6 +11,7 @@ interface FormSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: FormSelectOption[];
   error?: string;
   required?: boolean;
+  placeholder?: string;
 }
 
 const FormSelectInner = forwardRef<HTMLSelectElement, FormSelectProps>(

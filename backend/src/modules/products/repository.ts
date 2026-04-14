@@ -111,7 +111,7 @@ export const productRepository = {
             })) as unknown as Product;
         } catch (err) {
             if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-                throw new Error('PRODUCT_ALREADY_EXISTS');
+                throw new Error('PRODUCT_ALREADY_EXISTS', { cause: err });
             }
             throw err;
         }
@@ -178,7 +178,7 @@ export const productRepository = {
             })) as unknown as Product;
         } catch (err) {
             if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-                throw new Error('PRODUCT_ALREADY_EXISTS');
+                throw new Error('PRODUCT_ALREADY_EXISTS', { cause: err });
             }
             throw err;
         }
