@@ -13,9 +13,13 @@ vi.mock('../api', () => ({
     },
 }));
 
-vi.mock('react-redux', () => ({
-    useDispatch: () => mockDispatch,
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useDispatch: () => mockDispatch,
+    };
+});
 
 vi.mock('@auth0/auth0-react', () => ({
     useAuth0: () => ({

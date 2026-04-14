@@ -13,9 +13,13 @@ vi.mock('../hooks/useProducts', () => ({
     PRODUCTS_QUERY_KEY: ['products', 'list'],
 }));
 
-vi.mock('react-redux', () => ({
-    useSelector: vi.fn(),
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useSelector: vi.fn(),
+    };
+});
 
 describe('useProductList', () => {
     const wrapper = createTestWrapper();

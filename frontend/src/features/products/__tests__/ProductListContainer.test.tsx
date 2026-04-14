@@ -8,9 +8,13 @@ import { MESSAGES, PRODUCT_LIST_LIMIT } from '@/constants';
 import { Product } from '../types';
 
 const mockDispatch = vi.fn();
-vi.mock('react-redux', () => ({
-    useDispatch: () => mockDispatch,
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useDispatch: () => mockDispatch,
+    };
+});
 
 vi.mock('../hooks/useProductList', () => ({
     useProductList: vi.fn(),

@@ -1,16 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TestWrapper } from '../../../test/TestWrapper';
 import { CreateProductContainer } from '../containers/CreateProductContainer';
 import * as useCreateProductMock from '../hooks/useCreateProduct';
 import * as uploadImageMock from '../utils/uploadImage';
 
 const mockDispatch = vi.fn();
 
-vi.mock('react-redux', () => ({
-    useDispatch: () => mockDispatch,
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useDispatch: () => mockDispatch,
+    };
+});
 
 vi.mock('@auth0/auth0-react', () => ({
     useAuth0: () => ({
@@ -30,11 +33,6 @@ vi.mock('../utils/uploadImage', () => ({
 }));
 
 describe('CreateProductContainer', () => {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: { retry: false },
-        },
-    });
     const mockMutateAsync = vi.fn();
 
     beforeEach(() => {
@@ -61,11 +59,9 @@ describe('CreateProductContainer', () => {
 
     it('renders the create product form', () => {
         render(
-            <QueryClientProvider client={queryClient}>
-                <MemoryRouter>
-                    <CreateProductContainer />
-                </MemoryRouter>
-            </QueryClientProvider>
+            <TestWrapper>
+                <CreateProductContainer />
+            </TestWrapper>
         );
 
         expect(screen.getByRole('button', { name: /create product/i })).toBeDefined();
@@ -83,11 +79,9 @@ describe('CreateProductContainer', () => {
         vi.mocked(uploadImageMock.processAndUploadImage).mockResolvedValue(mockImageMetadata);
 
         render(
-            <QueryClientProvider client={queryClient}>
-                <MemoryRouter>
-                    <CreateProductContainer />
-                </MemoryRouter>
-            </QueryClientProvider>
+            <TestWrapper>
+                <CreateProductContainer />
+            </TestWrapper>
         );
 
         // Fill out required fields
@@ -133,9 +127,9 @@ describe('CreateProductContainer', () => {
         } as unknown as ReturnType<typeof useCreateProductMock.useCreateProduct>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <CreateProductContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByRole('button', { name: /saving/i })).toBeDefined();

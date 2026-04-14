@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Route, Routes } from 'react-router-dom';
+import { TestWrapper } from '../../../test/TestWrapper';
 import { ProductDetailContainer } from '../containers/ProductDetailContainer';
 import * as useProductMock from '../hooks/useProduct';
 import * as useUpdateProductMock from '../hooks/useUpdateProduct';
@@ -9,9 +9,13 @@ import { Product } from '../types';
 
 const mockDispatch = vi.fn();
 
-vi.mock('react-redux', () => ({
-    useDispatch: () => mockDispatch,
-}));
+vi.mock('react-redux', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-redux')>();
+    return {
+        ...actual,
+        useDispatch: () => mockDispatch,
+    };
+});
 
 vi.mock('@auth0/auth0-react', () => ({
     useAuth0: () => ({
@@ -32,11 +36,6 @@ vi.mock('../hooks/useUpdateProduct', () => ({
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 
 describe('ProductDetailContainer', () => {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: { retry: false },
-        },
-    });
     const mockUpdateMutateAsync = vi.fn();
 
     const mockProduct: Product = {
@@ -108,13 +107,11 @@ describe('ProductDetailContainer', () => {
 
     const renderComponent = () => {
         return render(
-            <QueryClientProvider client={queryClient}>
-                <MemoryRouter initialEntries={[`/product/${VALID_UUID}`]}>
-                    <Routes>
-                        <Route path="/product/:id" element={<ProductDetailContainer />} />
-                    </Routes>
-                </MemoryRouter>
-            </QueryClientProvider>
+            <TestWrapper initialEntries={[`/product/${VALID_UUID}`]}>
+                <Routes>
+                    <Route path="/product/:id" element={<ProductDetailContainer />} />
+                </Routes>
+            </TestWrapper>
         );
     };
 
