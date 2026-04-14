@@ -11,7 +11,7 @@ export default defineConfig({
       },
     }),
     process.env.NODE_ENV !== 'test' && tailwindcss(),
-  ].filter(Boolean) as any,
+  ].filter(Boolean) as import('vite').PluginOption[],
   server: {
     proxy: {
       '/api': {

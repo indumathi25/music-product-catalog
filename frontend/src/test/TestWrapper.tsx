@@ -34,6 +34,7 @@ export const TestWrapper: React.FC<TestWrapperProps> = ({ children, initialEntri
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const createTestWrapper = (initialEntries: string[] = ['/']) => {
     return ({ children }: { children: React.ReactNode }) => (
         <TestWrapper initialEntries={initialEntries}>

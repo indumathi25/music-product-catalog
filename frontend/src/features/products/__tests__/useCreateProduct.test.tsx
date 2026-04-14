@@ -3,7 +3,6 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createTestWrapper } from '../../../test/TestWrapper';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { productsApi } from '../api';
-import { PRODUCTS_QUERY_KEY } from '../hooks/useProducts';
 import { Product } from '../types';
 
 const mockDispatch = vi.fn();
