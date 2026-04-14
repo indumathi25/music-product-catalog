@@ -32,6 +32,20 @@ vi.mock('../utils/uploadImage', () => ({
     processAndUploadImage: vi.fn(),
 }));
 
+vi.mock('../../artists/hooks/useArtists', () => ({
+    useArtists: () => ({
+        data: [{ id: 'artist-1', name: 'Test Artist' }, { id: 'artist-2', name: 'New Artist' }],
+        isLoading: false,
+    }),
+}));
+
+vi.mock('../hooks/useArtistLibrary', () => ({
+    useArtistLibrary: () => ({
+        libraryImages: [],
+        isLibraryLoading: false,
+    }),
+}));
+
 describe('CreateProductContainer', () => {
     const mockMutateAsync = vi.fn();
 
@@ -96,7 +110,7 @@ describe('CreateProductContainer', () => {
         // Wait for upload to complete and button to be ready
         const submitButton = await screen.findByRole('button', { name: /create product/i });
         await waitFor(() => expect(submitButton).not.toBeDisabled());
-        fireEvent.click(submitButton);
+        fireEvent.submit(screen.getByRole('form', { name: /Product form/i }));
 
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith(expect.objectContaining({

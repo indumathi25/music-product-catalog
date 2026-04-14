@@ -33,6 +33,20 @@ vi.mock('../hooks/useUpdateProduct', () => ({
     useUpdateProduct: vi.fn(),
 }));
 
+vi.mock('../../artists/hooks/useArtists', () => ({
+    useArtists: () => ({
+        data: [{ id: 'artist-1', name: 'Test Artist' }, { id: 'artist-2', name: 'New Artist' }],
+        isLoading: false,
+    }),
+}));
+
+vi.mock('../hooks/useArtistLibrary', () => ({
+    useArtistLibrary: () => ({
+        libraryImages: [],
+        isLibraryLoading: false,
+    }),
+}));
+
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 
 describe('ProductDetailContainer', () => {
@@ -146,7 +160,7 @@ describe('ProductDetailContainer', () => {
         // Save
         const saveButton = screen.getByRole('button', { name: /Save Changes/i });
         await waitFor(() => expect(saveButton).not.toBeDisabled());
-        fireEvent.click(saveButton);
+        fireEvent.submit(screen.getByRole('form', { name: /Product form/i }));
 
         await waitFor(() => {
             expect(mockUpdateMutateAsync).toHaveBeenCalledWith(
