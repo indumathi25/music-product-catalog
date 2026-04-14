@@ -22,15 +22,21 @@ The architecture follows a "Public Discovery, Private Management" model: browsin
 
 ## Architectural
 
-### 1. The "Artist Library" & Global Deduplication
+### 1. The "Artist Library" & Data Integrity
 
-In most systems, deleting a product deletes its image. We built **"Survival Mode."**
-Images are treated as permanent Artist assets. When a product is deleted, the image persists in the Artist's library. This allows for:
+In most systems, the catalog can become "polluted" with misspelled artist names (e.g., "The Beatles" vs "Beatles"). We implemented **Strict Artist Management**:
+- **Curated Selection**: Users must select from a predefined list of artists, ensuring perfect data consistency across the platform.
+- **Product Integrity**: We enforce a database-level `unique` constraint on the `[title, artist_id]` combination. This means an artist can never accidentally have two products with the exact same title.
 
-- **Zero Storage Waste**: Reusing the same high-res cover art across multiple releases (Single, Album, Remix) without duplicate uploads.
-- **Catalog Continuity**: Artists can maintain a history of their visual assets independent of their current active products.
+### 2. Database Schema & Constraints
 
-### 2. Direct-to-Cloud Upload Pipeline
+We use a highly optimized PostgreSQL schema managed via Prisma. The core architecture relies on **Composite Unique Keys** to enforce business rules at the database level:
+
+- **Product Safety**: `@@unique([title, artist_id])` — prevents duplicate releases within an artist's catalog.
+- **Image "Survival Mode"**: `@@unique([url, artist_id])` — ensures that each unique asset URL is correctly bound to an artist, allowing for smart reuse and preventing orphaned files.
+- **Implicit Many-to-Many**: Products and Images are connected through an implicit join table (`_ImageToProduct`), enabling a single cover art to be linked to multiple product releases (Singles, Albums, Remixes) without duplicate storage.
+
+### 3. Direct-to-Cloud Upload Pipeline
 
 Instead of loading heavy binary files through the Node.js server (which blocks the event loop), we use **AWS S3 Presigned URLs**.
 
