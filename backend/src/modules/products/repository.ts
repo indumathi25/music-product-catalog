@@ -11,16 +11,20 @@ export const productRepository = {
     }): Promise<Product[]> => {
         const { search, artistName, skip, take } = params;
 
+        let searchIds: string[] | undefined;
+        if (search) {
+            const matches = await prisma.$queryRaw<{id: string}[]>`
+                SELECT p.id 
+                FROM products p
+                JOIN artists a ON p.artist_id = a.id
+                WHERE similarity(p.title, ${search}) > 0.15 OR similarity(a.name, ${search}) > 0.15
+            `;
+            searchIds = matches.map(m => m.id);
+        }
+
         const where: Prisma.ProductWhereInput = {
             AND: [
-                search
-                    ? {
-                        OR: [
-                            { title: { contains: search, mode: 'insensitive' } },
-                            { artist: { name: { contains: search, mode: 'insensitive' } } },
-                        ],
-                    }
-                    : {},
+                searchIds ? { id: { in: searchIds } } : {},
                 artistName ? { artist: { name: { contains: artistName, mode: 'insensitive' } } } : {},
             ],
         };
@@ -42,16 +46,20 @@ export const productRepository = {
     count: async (params: { search?: string; artistName?: string }): Promise<number> => {
         const { search, artistName } = params;
 
+        let searchIds: string[] | undefined;
+        if (search) {
+            const matches = await prisma.$queryRaw<{id: string}[]>`
+                SELECT p.id 
+                FROM products p
+                JOIN artists a ON p.artist_id = a.id
+                WHERE similarity(p.title, ${search}) > 0.15 OR similarity(a.name, ${search}) > 0.15
+            `;
+            searchIds = matches.map(m => m.id);
+        }
+
         const where: Prisma.ProductWhereInput = {
             AND: [
-                search
-                    ? {
-                        OR: [
-                            { title: { contains: search, mode: 'insensitive' } },
-                            { artist: { name: { contains: search, mode: 'insensitive' } } },
-                        ],
-                    }
-                    : {},
+                searchIds ? { id: { in: searchIds } } : {},
                 artistName ? { artist: { name: { contains: artistName, mode: 'insensitive' } } } : {},
             ],
         };
