@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProductDetailContainer } from '../containers/ProductDetailContainer';
 import * as useProductMock from '../hooks/useProduct';
 import * as useUpdateProductMock from '../hooks/useUpdateProduct';
@@ -31,6 +32,11 @@ vi.mock('../hooks/useUpdateProduct', () => ({
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 
 describe('ProductDetailContainer', () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+        },
+    });
     const mockUpdateMutateAsync = vi.fn();
 
     const mockProduct: Product = {
@@ -102,11 +108,13 @@ describe('ProductDetailContainer', () => {
 
     const renderComponent = () => {
         return render(
-            <MemoryRouter initialEntries={[`/product/${VALID_UUID}`]}>
-                <Routes>
-                    <Route path="/product/:id" element={<ProductDetailContainer />} />
-                </Routes>
-            </MemoryRouter>
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={[`/product/${VALID_UUID}`]}>
+                    <Routes>
+                        <Route path="/product/:id" element={<ProductDetailContainer />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>
         );
     };
 

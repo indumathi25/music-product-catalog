@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CreateProductContainer } from '../containers/CreateProductContainer';
 import * as useCreateProductMock from '../hooks/useCreateProduct';
 import * as uploadImageMock from '../utils/uploadImage';
@@ -29,6 +30,11 @@ vi.mock('../utils/uploadImage', () => ({
 }));
 
 describe('CreateProductContainer', () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+        },
+    });
     const mockMutateAsync = vi.fn();
 
     beforeEach(() => {
@@ -55,9 +61,11 @@ describe('CreateProductContainer', () => {
 
     it('renders the create product form', () => {
         render(
-            <MemoryRouter>
-                <CreateProductContainer />
-            </MemoryRouter>
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <CreateProductContainer />
+                </MemoryRouter>
+            </QueryClientProvider>
         );
 
         expect(screen.getByRole('button', { name: /create product/i })).toBeDefined();
@@ -75,9 +83,11 @@ describe('CreateProductContainer', () => {
         vi.mocked(uploadImageMock.processAndUploadImage).mockResolvedValue(mockImageMetadata);
 
         render(
-            <MemoryRouter>
-                <CreateProductContainer />
-            </MemoryRouter>
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <CreateProductContainer />
+                </MemoryRouter>
+            </QueryClientProvider>
         );
 
         // Fill out required fields

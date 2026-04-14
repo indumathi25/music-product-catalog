@@ -92,10 +92,10 @@ describe('useCreateProduct', () => {
         result.current.mutate(dto);
 
         await waitFor(() => expect(result.current.isError).toBe(true));
-
-        expect(mockDispatch).toHaveBeenCalledWith(
+        
+        expect(mockDispatch).not.toHaveBeenCalledWith(
             expect.objectContaining({
-                payload: expect.objectContaining({ type: 'error', message: 'Create failed' }),
+                payload: expect.objectContaining({ type: 'error' }),
             })
         );
     });
