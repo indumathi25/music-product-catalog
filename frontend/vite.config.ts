@@ -10,8 +10,8 @@ export default defineConfig({
         plugins: ['babel-plugin-react-compiler'],
       },
     }),
-    tailwindcss(),
-  ],
+    process.env.NODE_ENV !== 'test' && tailwindcss(),
+  ].filter(Boolean) as any,
   server: {
     proxy: {
       '/api': {
@@ -30,5 +30,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    server: {
+      deps: {
+        inline: [/@testing-library\/jest-dom/],
+      },
+    },
   },
 });

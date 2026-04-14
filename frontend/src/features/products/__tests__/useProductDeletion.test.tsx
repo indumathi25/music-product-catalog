@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { createTestWrapper } from '../../../test/TestWrapper';
 import { useProductDeletion } from '../hooks/useProductDeletion';
 import * as useDeleteProductMock from '../hooks/useDeleteProduct';
 import { Product } from '../types';
@@ -12,6 +13,7 @@ const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 
 describe('useProductDeletion', () => {
     const mockMutateAsync = vi.fn();
+    const wrapper = createTestWrapper();
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -36,12 +38,12 @@ describe('useProductDeletion', () => {
     });
 
     it('initializes with no selected product', () => {
-        const { result } = renderHook(() => useProductDeletion());
+        const { result } = renderHook(() => useProductDeletion(), { wrapper });
         expect(result.current.selectedProduct).toBeNull();
     });
 
     it('sets selected product on request', () => {
-        const { result } = renderHook(() => useProductDeletion());
+        const { result } = renderHook(() => useProductDeletion(), { wrapper });
         const product: Product = {
             id: VALID_UUID,
             title: 'Test',
@@ -60,7 +62,7 @@ describe('useProductDeletion', () => {
 
     it('calls mutate async and clears selection on confirm', async () => {
         mockMutateAsync.mockResolvedValueOnce(undefined);
-        const { result } = renderHook(() => useProductDeletion());
+        const { result } = renderHook(() => useProductDeletion(), { wrapper });
         const product: Product = {
             id: VALID_UUID,
             title: 'Test',
@@ -83,7 +85,7 @@ describe('useProductDeletion', () => {
     });
 
     it('clears selection on cancel', () => {
-        const { result } = renderHook(() => useProductDeletion());
+        const { result } = renderHook(() => useProductDeletion(), { wrapper });
         const product: Product = {
             id: VALID_UUID,
             title: 'Test',

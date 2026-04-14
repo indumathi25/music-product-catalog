@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestWrapper } from '../../../test/TestWrapper';
 import { ProductListContainer } from '../containers/ProductListContainer';
 import * as useProductListMock from '../hooks/useProductList';
 import * as useProductDeletionMock from '../hooks/useProductDeletion';
@@ -49,9 +49,9 @@ describe('ProductListContainer', () => {
         } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductListContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         // Skeleton elements inside the grid
@@ -74,9 +74,9 @@ describe('ProductListContainer', () => {
         } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductListContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByText('Failed to load products')).toBeDefined();
@@ -99,9 +99,9 @@ describe('ProductListContainer', () => {
         } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductListContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByText(MESSAGES.PRODUCT_LIST.EMPTY_ALL)).toBeDefined();
@@ -123,9 +123,9 @@ describe('ProductListContainer', () => {
         } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductListContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByText(MESSAGES.PRODUCT_LIST.EMPTY_FILTERED)).toBeDefined();
@@ -152,9 +152,9 @@ describe('ProductListContainer', () => {
         } as unknown as ReturnType<typeof useProductListMock.useProductList>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductListContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByText('Song 1')).toBeDefined();
@@ -189,9 +189,9 @@ describe('ProductListContainer', () => {
         } as unknown as ReturnType<typeof useProductDeletionMock.useProductDeletion>);
 
         render(
-            <MemoryRouter>
+            <TestWrapper>
                 <ProductListContainer />
-            </MemoryRouter>
+            </TestWrapper>
         );
 
         expect(screen.getByRole('dialog', { name: /delete product/i })).toBeDefined();

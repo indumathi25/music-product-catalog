@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createTestWrapper } from '../../../test/TestWrapper';
 import { useProduct } from '../hooks/useProduct';
 import { productsApi } from '../api';
 import { Product } from '../types';
@@ -11,21 +11,13 @@ vi.mock('../api', () => ({
     },
 }));
 
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: { retry: false },
-    }
-});
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-);
-
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 
 describe('useProduct', () => {
+    const wrapper = createTestWrapper();
+
     beforeEach(() => {
         vi.clearAllMocks();
-        queryClient.clear();
     });
 
     it('fetches a single product when id is provided', async () => {
