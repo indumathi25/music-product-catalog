@@ -144,7 +144,9 @@ describe('ProductDetailContainer', () => {
         fireEvent.change(screen.getByLabelText(/Product Title/i), { target: { value: 'Updated Song' } });
 
         // Save
-        fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
+        const saveButton = screen.getByRole('button', { name: /Save Changes/i });
+        await waitFor(() => expect(saveButton).not.toBeDisabled());
+        fireEvent.click(saveButton);
 
         await waitFor(() => {
             expect(mockUpdateMutateAsync).toHaveBeenCalledWith(

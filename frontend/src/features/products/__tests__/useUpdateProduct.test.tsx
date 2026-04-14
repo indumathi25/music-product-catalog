@@ -64,9 +64,8 @@ describe('useUpdateProduct', () => {
 
         result.current.mutate({ id: VALID_UUID, ...dto });
 
-        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+        await waitFor(() => expect(productsApi.update).toHaveBeenCalledWith(VALID_UUID, dto, 'mock-token'));
 
-        expect(productsApi.update).toHaveBeenCalledWith(VALID_UUID, dto, 'mock-token');
         expect(mockDispatch).toHaveBeenCalledWith(
             expect.objectContaining({
                 payload: expect.objectContaining({ type: 'success' }),

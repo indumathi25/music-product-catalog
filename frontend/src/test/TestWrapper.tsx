@@ -21,7 +21,7 @@ interface TestWrapperProps {
 }
 
 export const TestWrapper: React.FC<TestWrapperProps> = ({ children, initialEntries = ['/'] }) => {
-    const queryClient = createTestQueryClient();
+    const queryClient = React.useMemo(() => createTestQueryClient(), []);
     
     return (
         <Provider store={store}>

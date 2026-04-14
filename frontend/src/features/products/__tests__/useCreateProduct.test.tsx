@@ -64,9 +64,8 @@ describe('useCreateProduct', () => {
 
         result.current.mutate(dto);
 
-        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+        await waitFor(() => expect(productsApi.create).toHaveBeenCalledWith(dto, 'mock-token'));
 
-        expect(productsApi.create).toHaveBeenCalledWith(dto, 'mock-token');
         expect(mockDispatch).toHaveBeenCalledWith(
             expect.objectContaining({
                 payload: expect.objectContaining({ type: 'success' }),

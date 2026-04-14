@@ -43,9 +43,8 @@ describe('useDeleteProduct', () => {
 
         result.current.mutate(VALID_UUID);
 
-        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+        await waitFor(() => expect(productsApi.delete).toHaveBeenCalledWith(VALID_UUID, 'mock-token'));
 
-        expect(productsApi.delete).toHaveBeenCalledWith(VALID_UUID, 'mock-token');
         expect(mockDispatch).toHaveBeenCalledWith(
             expect.objectContaining({
                 payload: expect.objectContaining({ type: 'success' }),

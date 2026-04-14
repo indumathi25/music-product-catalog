@@ -95,6 +95,7 @@ describe('CreateProductContainer', () => {
 
         // Wait for upload to complete and button to be ready
         const submitButton = await screen.findByRole('button', { name: /create product/i });
+        await waitFor(() => expect(submitButton).not.toBeDisabled());
         fireEvent.click(submitButton);
 
         await waitFor(() => {
